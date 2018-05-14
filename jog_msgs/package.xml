@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>jog_msgs</name>
+  <version>0.0.0</version>
+  <description>The jog_msgs package</description>
+
+  <maintainer email="dev@opensource-robotics.tokyo.jp">Tokyo Opensource Robotics Kyokai(TORK) Developer Team</maintainer>
+
+  <license>Apache License 2.0</license>
+
+  <!-- <url type="website">http://wiki.ros.org/jog_msgs</url> -->
+  <author email="ryosuke.tajima@opensource-robotics.tokyo.jp">Ryosuke Tajima</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <export>
+    <architecture_independent/>
+  </export>
+</package>

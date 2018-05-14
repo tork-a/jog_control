@@ -29,6 +29,9 @@ include_directories(
 add_executable(jog_frame_node src/jog_frame_node.cpp)
 target_link_libraries(jog_frame_node ${catkin_LIBRARIES})
 
+add_executable(jog_joint_node src/jog_joint_node.cpp)
+target_link_libraries(jog_joint_node ${catkin_LIBRARIES})
+
 install(TARGETS jog_frame_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

@@ -8,7 +8,8 @@
     <param name="autorepeat_rate" value="100"/>
     <param name="deadzone" value="0.1"/>
   </node>
-  <node if="true" name="joy_to_jog_frame" pkg="jog_controller" type="joy_to_jog_frame.py">
+  <node if="false" name="joy_to_jog_frame" pkg="jog_controller" type="joy_to_jog_frame.py">
     <param name="group_name" value="manipulator"/>
   </node>
+  <node if="true" name="joy_to_jog_joint" pkg="jog_controller" type="joy_to_jog_joint.py"/>
 </launch>

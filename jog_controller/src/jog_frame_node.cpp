@@ -65,7 +65,7 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 
   if (ik_client_.call(srv))
   {
-    ROS_INFO_STREAM("response: " << srv.response);
+    // ROS_INFO_STREAM("response: " << srv.response);
   }
   else
   {

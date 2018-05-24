@@ -1,0 +1,17 @@
+<launch>
+  <include file="$(find melfa_driver)/launch/melfa_driver.launch">
+    <arg name="loopback" value="true"/>
+  </include>
+  
+  <include file="$(find rv7fl_moveit_config)/launch/moveit_planning_execution.launch"/>
+
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="controller_name" value="joint_trajectory_controller"/>
+    <param name="target_link" value="link6"/>
+  </node>
+  <node if="false" name="joy" pkg="joy" type="joy_node">
+    <param name="autorepeat_rate" value="100"/>
+    <param name="deadzone" value="0.1"/>
+  </node>
+  <node if="false" name="joy_to_jog_frame" pkg="jog_controller" type="joy_to_jog_frame.py"/>
+</launch>

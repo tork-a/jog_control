@@ -16,7 +16,9 @@
   <depend>jog_msgs</depend>
   <depend>moveit_msgs</depend>
   <depend>roscpp</depend>
+  <depend>rviz</depend>
 
   <export>
+    <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
 </package>

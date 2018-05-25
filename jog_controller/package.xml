@@ -17,6 +17,9 @@
   <depend>moveit_msgs</depend>
   <depend>roscpp</depend>
   <depend>rviz</depend>
+  <exec_depend>ur_gazebo</exec_depend>
+  <exec_depend>ur5_moveit_config</exec_depend>
+  <exec_depend>tra1_bringup</exec_depend>
 
   <export>
     <rviz plugin="${prefix}/plugin_description.xml"/>

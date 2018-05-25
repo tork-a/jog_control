@@ -12,8 +12,7 @@
   
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
     <param name="controller_name" value="arm_controller"/>
-    <param name="target_link" value="wrist_3_link"/>
-    <param name="group_name" value="manipulator"/>
+    <param name="target_link" value="ee_link"/>
   </node>
 
   <node if="false" name="joy" pkg="joy" type="joy_node">

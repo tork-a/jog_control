@@ -39,7 +39,7 @@ add_definitions(-DQT_NO_KEYWORDS -g)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(HEADER_FILES
-  src/jog_frame_panel.h
+  src/jog_frame_panel.h src/jog_joint_panel.h src/jog_slider.h
 )
 
 if(rviz_QT_VERSION VERSION_LESS "5")
@@ -50,6 +50,7 @@ endif()
 
 set(SOURCE_FILES
   src/jog_frame_panel.cpp
+  src/jog_joint_panel.cpp
   ${MOC_FILES}
   )
 

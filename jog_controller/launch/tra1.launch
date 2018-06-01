@@ -5,10 +5,15 @@
   
   <include file="$(find tra1_bringup)/launch/tra1_moveit.launch"/>
 
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <rosparam command="load" file="$(find jog_controller)/config/tra1_jog_joint.yaml"/>
+  </node>
+
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
     <param name="controller_name" value="position_trajectory_controller"/>
     <param name="target_link" value="link_j6"/>
   </node>
+
   <node if="false" name="joy" pkg="joy" type="joy_node">
     <param name="autorepeat_rate" value="100"/>
     <param name="deadzone" value="0.1"/>

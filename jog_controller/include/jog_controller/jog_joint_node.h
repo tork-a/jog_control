@@ -10,8 +10,11 @@
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
+#include <moveit_msgs/ExecuteTrajectoryAction.h>
 
-typedef actionlib::SimpleActionClient < control_msgs::FollowJointTrajectoryAction > TrajClient;
+// typedef actionlib::SimpleActionClient < control_msgs::FollowJointTrajectoryAction > TrajClient;
+
+typedef actionlib::SimpleActionClient < moveit_msgs::ExecuteTrajectoryAction > TrajClient;
 
 namespace jog_joint
 {

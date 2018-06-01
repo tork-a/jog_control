@@ -53,6 +53,8 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   jog_slider_->setMinimum(-1000);
   jog_slider_->setMaximum( 1000);
   jog_slider_->setTracking(true);
+  jog_slider_->setSingleStep(0);
+  jog_slider_->setPageStep(0);
   // How can I change the slider style more properly??
   jog_slider_->setStyleSheet("QSlider::handle {"
                              "background: white;"

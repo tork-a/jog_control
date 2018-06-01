@@ -14,7 +14,6 @@ JogJointNode::JogJointNode()
   nh_.param<std::string>("target_link", target_link_, "link_6");
 
 #if 0  
-
   traj_client_ = new TrajClient(controller_name + "/follow_joint_trajectory", true);
     
   while(!traj_client_->waitForServer(ros::Duration(60)))
@@ -23,6 +22,14 @@ JogJointNode::JogJointNode()
   }
   ROS_INFO_STREAM("Action server is ok!");
 #endif
+
+  // For MoveIt! fake controller
+  traj_client_ = new TrajClient("/execute_trajectory", true);
+  while(!traj_client_->waitForServer(ros::Duration(60)))
+  {
+    ROS_INFO_STREAM("Waiting for the MoveIt! fake joint controller");
+  }
+  ROS_INFO_STREAM("Action server is ok!");
   
   traj_pub_ =  nh_.advertise<trajectory_msgs::JointTrajectory>("/" + controller_name + "/command", 10);
   
@@ -42,9 +49,18 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
   ref_joint_state_.name = msg->name;
   ref_joint_state_.position.resize(msg->name.size());
   
-  for (int i=0; i<msg->displacement.size(); i++)
+  for (int i=0; i<ref_joint_state_.name.size(); i++)
   {
-    ref_joint_state_.position[i] = joint_state_.position[i] + msg->displacement[i];
+    // C++ is insane...
+    std::vector<std::string>::iterator it = \
+      std::find(joint_state_.name.begin(),
+                joint_state_.name.end(), ref_joint_state_.name[i]);
+    size_t index = std::distance(joint_state_.name.begin(), it);
+    if (index == joint_state_.name.size())
+    {
+      continue;
+    }
+    ref_joint_state_.position[i] = joint_state_.position[index] + msg->displacement[i];
   }
   trajectory_msgs::JointTrajectory traj;
   traj.header.stamp = ros::Time::now() + ros::Duration(0.01);
@@ -58,7 +74,15 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
   point.time_from_start = ros::Duration(0.1);
   traj.points.push_back(point);
 
+#define USE_MOVEIT 0
+#if USE_MOVEIT
+  moveit_msgs::ExecuteTrajectoryGoal goal;
+  goal.trajectory.joint_trajectory = traj;
+  traj_client_->sendGoal(goal);
+#else
   traj_pub_.publish(traj);
+#endif
+
 }
 
 /**

@@ -69,7 +69,7 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   }
   else
   {
-  ROS_ERROR("Failed to call service /compute_ik");
+    ROS_ERROR("Failed to call service /compute_ik");
   }
   if (srv.response.error_code.val < 0)
   {

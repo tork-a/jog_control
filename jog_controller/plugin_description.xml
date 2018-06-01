@@ -8,4 +8,12 @@
     </description>
   </class>
 
+  <class name="jog_controller/JogJointPanel"
+         type="jog_controller::JogJointPanel"
+         base_class_type="rviz::Panel">
+    <description>
+      A panel widget for joint jog interface
+    </description>
+  </class>
+
 </library>

@@ -16,6 +16,16 @@ namespace jog_controller
 JogFramePanel::JogFramePanel(QWidget* parent)
   : rviz::Panel(parent), jog_value_(0)
 {
+  ros::NodeHandle nh;
+  jog_frame_pub_ = nh.advertise<jog_msgs::JogFrame>( "jog_frame", 1);
+
+  // Get groups parameter of jog_frame_node
+  nh.getParam("/jog_frame_node/groups", groups_);
+  for (int i=0; i<groups_.size(); i++)
+  {
+    ROS_INFO_STREAM("groups:" << groups_[i]);
+  }
+  
   QHBoxLayout* enable_layout = new QHBoxLayout;
   enable_layout->addWidget( new QLabel( "Jog Enable:" ));
   jog_button_ = new QPushButton("OFF");
@@ -26,9 +36,9 @@ JogFramePanel::JogFramePanel(QWidget* parent)
 
   QHBoxLayout* group_layout = new QHBoxLayout;
   group_layout->addWidget( new QLabel( "Group:" ));
-  group_line_ = new QLineEdit;
-  group_line_->setPlaceholderText("move_group name");
-  group_layout->addWidget(group_line_);
+  group_cbox_ = new QComboBox();
+  updateGroups();
+  group_layout->addWidget(group_cbox_);
 
   QHBoxLayout* frame_layout = new QHBoxLayout;
   frame_layout->addWidget( new QLabel( "Frame:" ));
@@ -110,9 +120,6 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   QTimer* output_timer = new QTimer( this );
   connect( output_timer, SIGNAL( timeout() ), this, SLOT( publish() ));
   output_timer->start(10);
-
-  ros::NodeHandle nh;
-  jog_frame_pub_ = nh.advertise<jog_msgs::JogFrame>( "jog_frame", 1);
 }
 
 void JogFramePanel::onInitialize()
@@ -138,6 +145,22 @@ void JogFramePanel::update()
   fillNumericLabel(pos_z_text_, transform.getOrigin().z());
 }
 
+void JogFramePanel::updateGroups()
+{
+  typedef std::vector<std::string> string;
+  group_cbox_->clear();
+  for (auto it = groups_.begin(); it != groups_.end(); ++it )
+  {
+    const std::string& group = *it;
+    if (group.empty())
+    {
+      continue;
+    }
+    group_cbox_->addItem(group.c_str());
+  }
+}
+
+
 void JogFramePanel::updateFrame()
 {
   typedef std::vector<std::string> V_string;
@@ -154,6 +177,8 @@ void JogFramePanel::updateFrame()
     }
     frame_cbox_->addItem(it->c_str());
   }
+  frame_cbox_->setCurrentIndex(0);
+  frame_id_ = frame_cbox_->currentText().toStdString();
 }
 
 void JogFramePanel::updateTargetLink()
@@ -172,16 +197,20 @@ void JogFramePanel::updateTargetLink()
     }
     target_link_cbox_->addItem(it->c_str());
   }
+  target_link_cbox_->setCurrentIndex(0);
+  target_link_id_ = target_link_cbox_->currentText().toStdString();
 }
 
 
 void JogFramePanel::publish()
 {
+  boost::mutex::scoped_lock lock(mutex_);
+  
   // publish
   jog_msgs::JogFrame msg;
   msg.header.stamp = ros::Time::now();
   msg.header.frame_id = frame_id_;
-  msg.group_name = group_line_->text().toUtf8().constData();
+  msg.group_name = group_cbox_->currentText().toStdString();
   msg.link_name = target_link_id_;
   
   if (axis_id_ == "x")
@@ -262,6 +291,8 @@ void JogFramePanel::initAxisComboBox()
   axis_cbox_->addItem("x");
   axis_cbox_->addItem("y");
   axis_cbox_->addItem("z");
+  axis_cbox_->setCurrentIndex(0);
+  axis_id_ = axis_cbox_->currentText().toStdString();
 }
 
 QLineEdit* JogFramePanel::makeNumericLabel()

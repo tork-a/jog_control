@@ -27,6 +27,7 @@ class JogFramePanel: public rviz::Panel
   protected Q_SLOTS:
     void update();
     void updateFrame();
+    void updateGroups();
     void updateTargetLink();
     void respondEnable(bool checked);
     void respondFrame(int index);
@@ -38,7 +39,7 @@ class JogFramePanel: public rviz::Panel
     
   protected:
     QPushButton* jog_button_;
-    QLineEdit* group_line_;
+    QComboBox* group_cbox_;
     QComboBox* frame_cbox_;
     QComboBox* target_link_cbox_;
     QComboBox* axis_cbox_;
@@ -46,6 +47,7 @@ class JogFramePanel: public rviz::Panel
     QLineEdit* pos_x_text_;
     QLineEdit* pos_y_text_;
     QLineEdit* pos_z_text_;
+    std::vector<std::string> groups_;
     std::string frame_id_;
     std::string target_link_id_;
     std::string axis_id_;

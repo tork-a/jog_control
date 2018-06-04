@@ -1,0 +1,16 @@
+jog_joint_node:
+  controller_name: joint_trajectory_controller
+  joint_name:
+    - joint_s
+    - joint_l
+    - joint_e
+    - joint_u
+    - joint_r
+    - joint_b
+    - joint_t
+
+jog_frame_node:
+  controller_name: joint_trajectory_controller
+  groups:
+    - manipulator
+  target_link: link_t

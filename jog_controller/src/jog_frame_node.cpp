@@ -14,6 +14,7 @@ JogFrameNode::JogFrameNode()
   std::string controller_name;
   nh_.param<std::string>("controller_name", controller_name, "joint_trajectory_controller");
   nh_.param<std::string>("target_link", target_link_, "link_6");
+  nh_.param<std::vector <std::string> >("groups", group_list_);
 
 #if 0  
 
@@ -32,11 +33,12 @@ JogFrameNode::JogFrameNode()
 
 /**
  * @brief Callback function for the topic cmd_vel
- *
- */
+ * 
+*/
 void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 {
   moveit_msgs::GetPositionIK srv;
+
   srv.request.ik_request.group_name = msg->group_name;
   if (msg->link_name.empty())
   {

@@ -41,6 +41,9 @@ namespace jog_frame
     geometry_msgs::PoseStamped pose_stamped_;
     sensor_msgs::JointState ref_joint_state_;
     std::string target_link_;
+
+    std::string group_name_;
+    std::vector<std::string> group_list_;
   };
 
 }                               // namespace jog_frame

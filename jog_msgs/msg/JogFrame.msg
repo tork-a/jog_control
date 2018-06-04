@@ -1,6 +1,6 @@
 Header header
 string group_name
 string link_name
-geometry_msgs/Vector3 linear
-geometry_msgs/Vector3 angular
+geometry_msgs/Vector3 linear_delta
+geometry_msgs/Vector3 angular_delta
 bool avoid_collisions

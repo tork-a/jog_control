@@ -1,3 +1,3 @@
 Header header
-string[] name
-float64[] displacement
+string[] joints
+float64[] deltas

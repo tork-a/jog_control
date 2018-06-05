@@ -43,20 +43,35 @@ $ roslaunch jog_controller tra1.launch
 
 ![TRA1 jog control](image/tra1_jog.png)
 
-or NEXTAGE Open (not working yet):
+or Denso VS060:
+
+```
+$ roslaunch jog_controller vs060.launch
+```
+
+![Denso VS060 jog control](image/vs060_jog.png)
+
+or NEXTAGE Open:
 
 ```
 $ rtmlaunch nextage_ros_bridge nextage_ros_bridge_simulation.launch
 $ roslaunch jog_controller nextage.launch
 ```
 
+![NEXTAGE Open jog control](image/nextage_jog.png)
+
 ## rviz JogFramePanel Pugin
 
-You should add new panel JogFramePanel in rviz.
+You ca add new panel JogFramePanel in rviz. 
 
 ## Joypad control
 
 You can also use a joypad.
+TBA.
+
+## Teaching pendant
+
+You can also use a teaching pendant.
 TBA.
 
 # Packages

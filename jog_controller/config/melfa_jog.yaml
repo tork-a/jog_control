@@ -1,0 +1,15 @@
+jog_joint_node:
+  controller_name: joint_trajectory_controller
+  joint_name:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - joint5
+    - joint6
+
+jog_frame_node:
+  group_names:
+    - arm
+  link_names:
+    - link6

@@ -1,8 +1,0 @@
-controller_name: position_trajectory_controller
-joint_name:
-  - joint1
-  - joint2
-  - joint3
-  - joint4
-  - joint5
-  - joint6

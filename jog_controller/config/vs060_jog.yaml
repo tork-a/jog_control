@@ -1,0 +1,15 @@
+jog_joint_node:
+  controller_name: arm_controller/position_trajectory_controller
+  joint_names:
+    - j1
+    - j2
+    - j3
+    - j4
+    - j5
+    - flange
+
+jog_frame_node:
+  group_names:
+    - manipulator
+  link_names:
+    - Flange

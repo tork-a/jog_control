@@ -1,0 +1,15 @@
+<launch>
+  <!-- Launch MoveIt! -->
+  <include file="$(find denso_launch)/launch/denso_vs060_moveit_demo_simulation.launch"/>
+  
+  <!-- Jog controllers -->
+  <rosparam command="load"
+	    file="$(find jog_controller)/config/vs060_jog.yaml"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <remap from="joint_states" to="arm_controller/joint_states"/>
+  </node>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <remap from="joint_states" to="arm_controller/joint_states"/>
+  </node>
+
+</launch>

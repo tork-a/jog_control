@@ -1,0 +1,17 @@
+jog_joint_node:
+  controller_name: larm_controller
+  joint_names:
+    - LARM_JOINT0
+    - LARM_JOINT1
+    - LARM_JOINT2
+    - LARM_JOINT3
+    - LARM_JOINT4
+    - LARM_JOINT5
+
+jog_frame_node:
+  group_names:
+    - left_arm
+    - right_arm
+  link_names:
+    - LARM_JOINT5_Link
+    - RARM_JOINT5_Link

@@ -1,8 +1,8 @@
 <launch>
   <include file="$(find nextage_moveit_config)/launch/moveit_planning_execution.launch"/>
 
-  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
-    <param name="controller_name" value="rarm_controller"/>
-    <param name="target_link" value="RARM_JOINT5_Link"/>
-  </node>
+  <rosparam command="load" file="$(find jog_controller)/config/nextage_jog.yaml"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
+
 </launch>

@@ -6,10 +6,16 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   jog_msgs
+  moveit_core
+  moveit_ros_planning
+  moveit_visual_tools
   moveit_msgs
   roscpp
   rviz
 )
+
+find_package(Boost REQUIRED system filesystem date_time thread)
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -17,8 +23,11 @@ find_package(catkin REQUIRED COMPONENTS
 # catkin_python_setup()
 
 catkin_package(
-  DEPENDS rviz
-  CATKIN_DEPENDS actionlib jog_msgs moveit_msgs roscpp
+  CATKIN_DEPENDS actionlib jog_msgs
+  moveit_core
+  moveit_ros_planning
+  moveit_visual_tools
+  moveit_msgs roscpp
   INCLUDE_DIRS
   LIBRARIES
 )
@@ -67,10 +76,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 add_executable(jog_frame_node src/jog_frame_node.cpp)
-target_link_libraries(jog_frame_node ${catkin_LIBRARIES})
+target_link_libraries(jog_frame_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(jog_joint_node src/jog_joint_node.cpp)
-target_link_libraries(jog_joint_node ${catkin_LIBRARIES})
+target_link_libraries(jog_joint_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS jog_frame_node jog_joint_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

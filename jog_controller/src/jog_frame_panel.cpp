@@ -20,10 +20,15 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   jog_frame_pub_ = nh.advertise<jog_msgs::JogFrame>( "jog_frame", 1);
 
   // Get groups parameter of jog_frame_node
-  nh.getParam("/jog_frame_node/groups", groups_);
-  for (int i=0; i<groups_.size(); i++)
+  nh.getParam("/jog_frame_node/group_names", group_names_);
+  for (int i=0; i<group_names_.size(); i++)
   {
-    ROS_INFO_STREAM("groups:" << groups_[i]);
+    ROS_INFO_STREAM("group_names:" << group_names_[i]);
+  }
+  nh.getParam("/jog_frame_node/link_names", link_names_);
+  for (int i=0; i<link_names_.size(); i++)
+  {
+    ROS_INFO_STREAM("link_names:" << link_names_[i]);
   }
   
   QHBoxLayout* enable_layout = new QHBoxLayout;
@@ -147,9 +152,8 @@ void JogFramePanel::update()
 
 void JogFramePanel::updateGroups()
 {
-  typedef std::vector<std::string> string;
   group_cbox_->clear();
-  for (auto it = groups_.begin(); it != groups_.end(); ++it )
+  for (auto it = group_names_.begin(); it != group_names_.end(); it++)
   {
     const std::string& group = *it;
     if (group.empty())
@@ -183,19 +187,10 @@ void JogFramePanel::updateFrame()
 
 void JogFramePanel::updateTargetLink()
 {
-  typedef std::vector<std::string> V_string;
-  V_string frames;
-  vis_manager_->getTFClient()->getFrameStrings( frames );
-  std::sort(frames.begin(), frames.end());
   target_link_cbox_->clear();
-  for (V_string::iterator it = frames.begin(); it != frames.end(); ++it )
+  for (int i=0; i<link_names_.size(); i++)
   {
-    const std::string& frame = *it;
-    if (frame.empty())
-    {
-      continue;
-    }
-    target_link_cbox_->addItem(it->c_str());
+    target_link_cbox_->addItem(link_names_[i].c_str());
   }
   target_link_cbox_->setCurrentIndex(0);
   target_link_id_ = target_link_cbox_->currentText().toStdString();
@@ -268,7 +263,7 @@ void JogFramePanel::respondAxis(int index)
 void JogFramePanel::respondSliderChanged(int value)
 {
   boost::mutex::scoped_lock lock(mutex_);
-  jog_value_ = 0.1 * value / 1000.0;
+  jog_value_ = 0.05 * value / 1000.0;
 }
 
 void JogFramePanel::respondSliderReleased()

@@ -19,7 +19,7 @@ JogJointPanel::JogJointPanel(QWidget* parent)
   controller_name_ = "jog_joint_node";
   // Parameters
   ros::NodeHandle nh;
-  nh.getParam("/" + controller_name_ + "/joint_name", joint_name_);
+  nh.getParam("/" + controller_name_ + "/joint_names", joint_name_);
   jog_joint_num_ = joint_name_.size();
   jog_value_.resize(jog_joint_num_);
 

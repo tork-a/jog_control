@@ -5,6 +5,9 @@
 #include <ros/ros.h>
 #include <jog_msgs/JogFrame.h>
 #include <sensor_msgs/JointState.h>
+#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_state/robot_state.h>
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
@@ -35,7 +38,7 @@ namespace jog_frame
     ros::ServiceClient fk_client_, ik_client_;
 
     TrajClient *traj_client_;
-    ros::Publisher traj_pub_;
+    std::map<std::string,ros::Publisher> traj_pubs_;
 
     sensor_msgs::JointState joint_state_;
     geometry_msgs::PoseStamped pose_stamped_;
@@ -43,7 +46,14 @@ namespace jog_frame
     std::string target_link_;
 
     std::string group_name_;
-    std::vector<std::string> group_list_;
+
+    std::vector<std::string> joint_names_;
+
+    robot_state::RobotState* robot_state_;
+    std::vector<robot_state::JointModelGroup*> joint_groups_;
+
+    std::map<std::string,std::string> controller_map_;
+    std::map<std::string,std::vector<std::string> > joint_map_;
   };
 
 }                               // namespace jog_frame

@@ -7,13 +7,13 @@
 
   <!-- Load joint trajecotory controller -->
   <rosparam file="$(find jog_controller)/config/motoman_sia5d_controllers.yaml" />
-  
+
   <node name="controller_spawner"
 	pkg="controller_manager" type="spawner" respawn="false"
 	args="joint_state_controller joint_trajectory_controller"/> 
 
-  <rosparam command="load" file="$(find jog_controller)/config/motoman_sia5d_jog.yaml"/>
-  
+  <rosparam command="load"
+	    file="$(find jog_controller)/config/motoman_sia5d_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
 

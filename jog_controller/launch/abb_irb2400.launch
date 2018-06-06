@@ -1,0 +1,15 @@
+<launch>
+  <param name="pub_rate" value="100.0"/>
+  
+  <!-- Launch MoveIt! -->
+  <include if="true"
+	   file="$(find abb_irb2400_moveit_config)/launch/moveit_planning_execution.launch"/>
+
+  <!-- Launch jog controllers -->
+  <rosparam command="load"
+	    file="$(find jog_controller)/config/abb_irb2400_jog.yaml"/>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="use_action" value="true"/>
+  </node>
+
+</launch>

@@ -18,6 +18,8 @@ JogFrameNode::JogFrameNode()
   //nh_.param<std::vector <std::string> >("joint_names", joint_names_);
   nh_.getParam("joint_names", joint_names_);
 
+  nh_.param<bool>("use_action", use_action_, false);
+
   if (!nh_.hasParam("/move_group/controller_list"))
   {
     ROS_ERROR_STREAM("No controller_list specified.");
@@ -87,20 +89,24 @@ JogFrameNode::JogFrameNode()
   }
 #endif
   
-#if 0  
-  traj_client_ = new TrajClient(controller_name + "/follow_joint_trajectory", true);
+  if (use_action_)
+  {
+    traj_client_ = new TrajClient(controller_name + "/joint_trajectory_action", true);
     
-  while(!traj_client_->waitForServer(ros::Duration(60)))
-  {
-    ROS_INFO_STREAM("Waiting for the joint_trajectory_action server");
+    while(!traj_client_->waitForServer(ros::Duration(60)))
+    {
+      ROS_INFO_STREAM("Waiting for the joint_trajectory_action server");
+    }
+    ROS_INFO_STREAM("Action server is ok!");
   }
-  ROS_INFO_STREAM("Action server is ok!");
-#endif
-  // Create publisher for each controller
-  for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+  else
   {
-    auto name = it->first;
-    traj_pubs_[name] = nh_.advertise<trajectory_msgs::JointTrajectory>("/" + name + "/command", 10);
+    // Create publisher for each controller
+    for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+    {
+      auto name = it->first;
+      traj_pubs_[name] = nh_.advertise<trajectory_msgs::JointTrajectory>("/" + name + "/command", 10);
+    }
   }
 }
 
@@ -225,19 +231,35 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
       velocities[i] = 0;
       accelerations[i] = 0;
     }
-    trajectory_msgs::JointTrajectory traj;
-    traj.header.stamp = ros::Time::now();
-    traj.header.frame_id = "base_link";
-    traj.joint_names = joint_names;
-    
     trajectory_msgs::JointTrajectoryPoint point;
     point.positions = positions;
     point.velocities = velocities;
     point.accelerations = accelerations;
     point.time_from_start = ros::Duration(1.0);
-    traj.points.push_back(point);
 
-    traj_pubs_[controller_name].publish(traj);
+    if (use_action_)
+    {
+      //point.time_from_start = ros::Duration(0.2);
+
+      control_msgs::FollowJointTrajectoryGoal goal;
+      goal.trajectory.header.stamp = ros::Time::now();
+      goal.trajectory.header.frame_id = "base_link";
+      goal.trajectory.joint_names = joint_names;
+
+      goal.trajectory.points.push_back(point);
+    
+      traj_client_->sendGoal(goal);
+    }
+    else
+    {
+      trajectory_msgs::JointTrajectory traj;
+      traj.header.stamp = ros::Time::now();
+      traj.header.frame_id = "base_link";
+      traj.joint_names = joint_names;
+      traj.points.push_back(point);
+      
+      traj_pubs_[controller_name].publish(traj);
+    }
   }
 }
 

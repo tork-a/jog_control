@@ -1,0 +1,18 @@
+jog_joint_node:
+  controller_name: /robot/limb/right
+  joint_names:
+    - right_s0
+    - right_s1
+    - right_e0
+    - right_e1
+    - right_w0
+    - right_w1
+    - right_w2
+
+jog_frame_node:
+  group_names:
+    - left_arm
+    - right_arm
+  link_names:
+    - left_hand
+    - right_hand

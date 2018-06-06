@@ -124,7 +124,7 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   // Timer for update Frame ComboBox
   QTimer* output_timer = new QTimer( this );
   connect( output_timer, SIGNAL( timeout() ), this, SLOT( publish() ));
-  output_timer->start(10);
+  output_timer->start(100);
 }
 
 void JogFramePanel::onInitialize()

@@ -1,0 +1,21 @@
+<launch>
+  <param name="pub_rate" value="100.0"/>
+  
+  <!-- Launch MoveIt! -->
+  <include file="$(find motoman_sia20d_moveit_config)/launch/moveit_planning_execution.launch">
+    <arg name="sim" value="true"/>
+  </include>
+
+  <!-- Launch jog controllers -->
+  <rosparam command="load"
+	    file="$(find jog_controller)/config/motoman_sia20d_jog.yaml"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <param name="use_action" value="true"/>
+    <param name="time_from_start" value="1.0"/>
+  </node>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="use_action" value="true"/>
+    <param name="time_from_start" value="0.01"/>
+  </node>
+
+</launch>

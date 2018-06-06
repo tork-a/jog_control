@@ -17,7 +17,7 @@ JogFrameNode::JogFrameNode()
   nh_.param<std::string>("group", group_name_);
   //nh_.param<std::vector <std::string> >("joint_names", joint_names_);
   nh_.getParam("joint_names", joint_names_);
-
+  nh_.param<double>("time_from_start", time_from_start_, 0.5);
   nh_.param<bool>("use_action", use_action_, false);
 
   if (!nh_.hasParam("/move_group/controller_list"))
@@ -235,12 +235,10 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
     point.positions = positions;
     point.velocities = velocities;
     point.accelerations = accelerations;
-    point.time_from_start = ros::Duration(1.0);
+    point.time_from_start = ros::Duration(time_from_start_);
 
     if (use_action_)
     {
-      //point.time_from_start = ros::Duration(0.2);
-
       control_msgs::FollowJointTrajectoryGoal goal;
       goal.trajectory.header.stamp = ros::Time::now();
       goal.trajectory.header.frame_id = "base_link";

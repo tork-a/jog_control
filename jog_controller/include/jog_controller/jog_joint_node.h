@@ -42,6 +42,8 @@ namespace jog_joint
     geometry_msgs::PoseStamped pose_stamped_;
     sensor_msgs::JointState ref_joint_state_;
     std::string target_link_;
+    double time_from_start_;
+    bool use_action_;
   };
 
 }                               // namespace jog_joint

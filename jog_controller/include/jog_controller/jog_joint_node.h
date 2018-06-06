@@ -12,9 +12,7 @@
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <moveit_msgs/ExecuteTrajectoryAction.h>
 
-// typedef actionlib::SimpleActionClient < control_msgs::FollowJointTrajectoryAction > TrajClient;
-
-typedef actionlib::SimpleActionClient < moveit_msgs::ExecuteTrajectoryAction > TrajClient;
+typedef actionlib::SimpleActionClient <control_msgs::FollowJointTrajectoryAction > TrajClient;
 
 namespace jog_joint
 {
@@ -44,6 +42,8 @@ namespace jog_joint
     geometry_msgs::PoseStamped pose_stamped_;
     sensor_msgs::JointState ref_joint_state_;
     std::string target_link_;
+    double time_from_start_;
+    bool use_action_;
   };
 
 }                               // namespace jog_joint

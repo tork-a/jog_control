@@ -1,0 +1,9 @@
+jog_joint_node:
+  controller_name: ""
+  joint_names: [joint_s, joint_l, joint_e, joint_u, joint_r, joint_b, joint_t]
+
+jog_frame_node:
+  group_names:
+    - manipulator
+  link_names:
+    - tool0

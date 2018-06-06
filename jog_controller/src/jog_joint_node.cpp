@@ -12,27 +12,23 @@ JogJointNode::JogJointNode()
   std::string controller_name;
   nh_.param<std::string>("controller_name", controller_name, "joint_trajectory_controller");
   nh_.param<std::string>("target_link", target_link_, "link_6");
+  nh_.param<double>("time_from_start", time_from_start_, false);
+  nh_.param<bool>("use_action", use_action_, false);
 
-#if 0  
-  traj_client_ = new TrajClient(controller_name + "/follow_joint_trajectory", true);
+  if (use_action_)
+  {
+    traj_client_ = new TrajClient(controller_name + "/joint_trajectory_action", true);
     
-  while(!traj_client_->waitForServer(ros::Duration(60)))
-  {
-    ROS_INFO_STREAM("Waiting for the joint_trajectory_action server");
+    while(!traj_client_->waitForServer(ros::Duration(60)))
+    {
+      ROS_INFO_STREAM("Waiting for the joint_trajectory_action server");
+    }
+    ROS_INFO_STREAM("Action server is ok!");
   }
-  ROS_INFO_STREAM("Action server is ok!");
-#endif
-
-  // For MoveIt! fake controller
-  traj_client_ = new TrajClient("/execute_trajectory", true);
-  while(!traj_client_->waitForServer(ros::Duration(60)))
+  else
   {
-    ROS_INFO_STREAM("Waiting for the MoveIt! fake joint controller");
+    traj_pub_ = nh_.advertise<trajectory_msgs::JointTrajectory>("/" + controller_name + "/command", 10);
   }
-  ROS_INFO_STREAM("Action server is ok!");
-  
-  traj_pub_ =  nh_.advertise<trajectory_msgs::JointTrajectory>("/" + controller_name + "/command", 10);
-  
 }
 
 /**
@@ -62,27 +58,30 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
     }
     ref_joint_state_.position[i] = joint_state_.position[index] + msg->displacement[i];
   }
-  trajectory_msgs::JointTrajectory traj;
-  traj.header.stamp = ros::Time::now() + ros::Duration(0.01);
-  traj.header.frame_id = "base_link";
-  traj.joint_names = ref_joint_state_.name;
-    
   trajectory_msgs::JointTrajectoryPoint point;
   point.positions = ref_joint_state_.position;
   point.velocities.resize(ref_joint_state_.name.size());
   point.accelerations.resize(ref_joint_state_.name.size());
-  point.time_from_start = ros::Duration(0.1);
-  traj.points.push_back(point);
+  point.time_from_start = ros::Duration(time_from_start_);
 
-#define USE_MOVEIT 0
-#if USE_MOVEIT
-  moveit_msgs::ExecuteTrajectoryGoal goal;
-  goal.trajectory.joint_trajectory = traj;
-  traj_client_->sendGoal(goal);
-#else
-  traj_pub_.publish(traj);
-#endif
-
+  if (use_action_)
+  {
+      control_msgs::FollowJointTrajectoryGoal goal;
+      goal.trajectory.header.stamp = ros::Time::now();
+      goal.trajectory.header.frame_id = "base_link";
+      goal.trajectory.joint_names = ref_joint_state_.name;
+      goal.trajectory.points.push_back(point);
+      traj_client_->sendGoal(goal);
+  }
+  else
+  {
+    trajectory_msgs::JointTrajectory traj;
+    traj.header.stamp = ros::Time::now() + ros::Duration(0.01);
+    traj.header.frame_id = "base_link";
+    traj.joint_names = ref_joint_state_.name;
+    traj.points.push_back(point);
+    traj_pub_.publish(traj);
+  }
 }
 
 /**

@@ -37,6 +37,8 @@ namespace jog_frame
     ros::Subscriber joint_state_sub_, jog_frame_sub_;
     ros::ServiceClient fk_client_, ik_client_;
 
+    double time_from_start_;
+    bool use_action_;
     TrajClient *traj_client_;
     std::map<std::string,ros::Publisher> traj_pubs_;
 

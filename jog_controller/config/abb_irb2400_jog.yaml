@@ -6,7 +6,7 @@ move_group:
       joints: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]
 
 jog_joint_node:
-  controller_name: arm_controller
+  controller_name: ""
   joint_names: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]
 
 jog_frame_node:

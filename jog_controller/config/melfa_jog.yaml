@@ -1,6 +1,5 @@
 jog_joint_node:
-  controller_name: joint_trajectory_controller
-  joint_name:
+  joint_names:
     - joint1
     - joint2
     - joint3

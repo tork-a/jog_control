@@ -22,13 +22,15 @@
 
   <node name="controller_spawner"
 	pkg="controller_manager" type="spawner" respawn="false"
-	args="joint_state_controller /robot/limb/right /robot/limb/left"/> 
+	args="joint_state_controller robot/limb/right robot/limb/left"/> 
 
   <rosparam command="load"
 	    file="$(find jog_controller)/config/baxter_jog.yaml"/>
-  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <remap from="joint_states" to="robot/joint_states"/>
+  </node>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
-    <remap from="joint_states" to="/robot/joint_states"/>
+    <remap from="joint_states" to="robot/joint_states"/>
   </node>
 
 

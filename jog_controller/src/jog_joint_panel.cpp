@@ -19,6 +19,7 @@ JogJointPanel::JogJointPanel(QWidget* parent)
   controller_name_ = "jog_joint_node";
   // Parameters
   ros::NodeHandle nh;
+
   nh.getParam("/" + controller_name_ + "/joint_names", joint_name_);
   jog_joint_num_ = joint_name_.size();
   jog_value_.resize(jog_joint_num_);
@@ -91,7 +92,7 @@ JogJointPanel::JogJointPanel(QWidget* parent)
   // Timer for publish
   QTimer* output_timer = new QTimer( this );
   connect( output_timer, SIGNAL( timeout() ), this, SLOT( publish() ));
-  output_timer->start(10);
+  output_timer->start(100);
 
   jog_joint_pub_ = nh.advertise<jog_msgs::JogJoint>( "jog_joint", 1);
 }

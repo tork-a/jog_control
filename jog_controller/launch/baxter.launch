@@ -1,0 +1,37 @@
+<launch>
+  <!-- Load model file -->
+  <param name="robot_description" textfile="$(find baxter_description)/urdf/baxter.urdf" />
+
+  <node name="tfpub" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 world base 100"/>
+  
+  <!-- Launch MoveIt! -->
+  <include file="$(find baxter_moveit_config)/launch/demo_baxter.launch"/>
+  
+  <!-- fake_joint_driver_node -->
+  <node name="fake_joint_driver" pkg="fake_joint_driver" type="fake_joint_driver_node">
+    <remap from="joint_states" to="/robot/joint_states"/>
+  </node>
+
+  <!-- robot_state_publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <remap from="joint_states" to="/robot/joint_states"/>
+  </node>
+
+  <!-- Load joint trajecotory controller -->
+  <rosparam file="$(find jog_controller)/config/baxter_controllers.yaml" />
+
+  <node name="controller_spawner"
+	pkg="controller_manager" type="spawner" respawn="false"
+	args="joint_state_controller robot/limb/right robot/limb/left"/> 
+
+  <rosparam command="load"
+	    file="$(find jog_controller)/config/baxter_jog.yaml"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <remap from="joint_states" to="robot/joint_states"/>
+  </node>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <remap from="joint_states" to="robot/joint_states"/>
+  </node>
+
+
+</launch>

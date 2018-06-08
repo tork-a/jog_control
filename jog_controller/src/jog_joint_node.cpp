@@ -2,85 +2,219 @@
 
 namespace jog_joint {
 
-JogJointNode::JogJointNode()
-  : nh_("~")
+int JogJointNode::get_controller_list()
 {
-  joint_state_sub_ = nh_.subscribe("/joint_states", 1, &JogJointNode::joint_state_cb, this);
-  jog_joint_sub_ = nh_.subscribe("/jog_joint", 1, &JogJointNode::jog_joint_cb, this);
-  ros::topic::waitForMessage<sensor_msgs::JointState>("/joint_states");
+  ros::NodeHandle gnh;
 
-  std::string controller_name;
-  nh_.param<std::string>("controller_name", controller_name, "joint_trajectory_controller");
-  nh_.param<std::string>("target_link", target_link_, "link_6");
-  nh_.param<double>("time_from_start", time_from_start_, false);
-  nh_.param<bool>("use_action", use_action_, false);
+  // Get controller information from move_group/controller_list
+  if (!gnh.hasParam("move_group/controller_list"))
+  {
+    ROS_ERROR_STREAM("move_group/controller_list is not specified.");
+    return -1;
+  }
+  XmlRpc::XmlRpcValue controller_list;
+  gnh.getParam("move_group/controller_list", controller_list);
+  for (int i = 0; i < controller_list.size(); i++)
+  {
+    if (!controller_list[i].hasMember("name"))
+    {
+      ROS_ERROR("name must be specifed for each controller.");
+      return -1;
+    }
+    if (!controller_list[i].hasMember("joints"))
+    {
+      ROS_ERROR("joints must be specifed for each controller.");
+      return -1;
+    }
+    try
+    {
+      // get name member
+      std::string name = std::string(controller_list[i]["name"]);
+      // get action_ns member if exists
+      std::string action_ns = std::string("");
+      if (controller_list[i].hasMember("action_ns"))
+      {
+        action_ns = std::string(controller_list[i]["action_ns"]);
+      }
+      // get joints member
+      if (controller_list[i]["joints"].getType() != XmlRpc::XmlRpcValue::TypeArray)
+      {
+        ROS_ERROR_STREAM("joints for controller " << name << " is not specified as an array");
+        return -1;
+      }
+      auto joints = controller_list[i]["joints"];
+      // Get type member
+      std::string type = std::string("FollowJointTrajectory");
+      if (!controller_list[i].hasMember("type"))
+      {
+        ROS_WARN_STREAM("type is not specifed for controller " << name << ", using default FollowJointTrajectory");
+      }
+      type = std::string(controller_list[i]["type"]);
+      if (type != "FollowJointTrajectory")
+      {
+        ROS_ERROR_STREAM("controller type " << type << " is not supported");
+        return -1;
+      }
+      // Create controller map
+      cinfo_map_[name].action_ns = action_ns;
+      cinfo_map_[name].joints.resize(joints.size());
+      for (int j = 0; j < cinfo_map_[name].joints.size(); ++j)
+      {
+        cinfo_map_[name].joints[j] = std::string(joints[j]);
+      }
+    }
+    catch (...)
+    {
+      ROS_ERROR_STREAM("Caught unknown exception while parsing controller information");
+      return -1;
+    }
+  }
+  return 0;
+}
+
+JogJointNode::JogJointNode()
+{
+  ros::NodeHandle gnh, pnh("~");
+
+  pnh.param<double>("time_from_start", time_from_start_, 0.5);
+  pnh.param<bool>("use_action", use_action_, false);
+
+  if (get_controller_list() < 0)
+  {
+    ROS_ERROR("get_controller_list faild. Aborted.");
+    ros::shutdown();
+    return;
+  }
+  ROS_INFO_STREAM("controller_list:");
+  for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+  {
+    auto cinfo = it->second;
+    ROS_INFO_STREAM("- " << it->first);
+    for (int i=0; i<cinfo.joints.size(); i++)
+    {
+      ROS_INFO_STREAM("  - " << cinfo.joints[i]);
+    }    
+  }  
+  
+  // Create subscribers
+  joint_state_sub_ = gnh.subscribe("joint_states", 1, &JogJointNode::joint_state_cb, this);
+  jog_joint_sub_ = gnh.subscribe("jog_joint", 1, &JogJointNode::jog_joint_cb, this);
+
+  // Waiting for joint_states
+  for (;;)
+  {
+    sensor_msgs::JointStateConstPtr msg;
+    msg = ros::topic::waitForMessage<sensor_msgs::JointState>("joint_states", ros::Duration(1));
+    if (msg)
+    {
+      ROS_INFO_STREAM("joint_states message received.");
+      break;
+    }
+    ROS_WARN_STREAM("Waiting for joint_states message...");
+  }
 
   if (use_action_)
   {
-    traj_client_ = new TrajClient(controller_name + "/joint_trajectory_action", true);
-    
-    while(!traj_client_->waitForServer(ros::Duration(60)))
+    // Create action client for each controller
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
     {
-      ROS_INFO_STREAM("Waiting for the joint_trajectory_action server");
+      auto controller_name = it->first;
+      auto controller_info = it->second;
+      std::string action_name = controller_name + controller_info.action_ns;
+      
+      traj_clients_[controller_name] = new TrajClient(action_name, true);
     }
-    ROS_INFO_STREAM("Action server is ok!");
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+    {
+      auto controller_name = it->first;
+      auto controller_info = it->second;
+      auto action_name = controller_name + controller_info.action_ns;
+      
+      for(;;)
+      {
+        if (traj_clients_[controller_name]->waitForServer(ros::Duration(1)))
+        {
+          ROS_INFO_STREAM(action_name << " is ready.");
+          break;
+        }
+        ROS_WARN_STREAM("Waiting for " << action_name << "server...");
+      }
+    }
   }
   else
   {
-    traj_pub_ = nh_.advertise<trajectory_msgs::JointTrajectory>("/" + controller_name + "/command", 10);
+    // Create publisher for each controller
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+    {
+      auto controller_name = it->first;
+      traj_pubs_[controller_name] = gnh.advertise<trajectory_msgs::JointTrajectory>(controller_name + "/command", 1);
+    }
   }
 }
 
 /**
- * @brief Callback function for the topic cmd_vel
+ * @brief Callback function for the topic jog_joint
  *
  */
 void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
 {
   if (msg->name.size() != msg->displacement.size())
   {
-    ROS_ERROR("JogJoint: size mismatch");
+    ROS_ERROR("Size mismatch of joint_names and deltas");
     return;
   }
-  ref_joint_state_.name = msg->name;
-  ref_joint_state_.position.resize(msg->name.size());
-  
-  for (int i=0; i<ref_joint_state_.name.size(); i++)
+  // Publish trajectory message for each controller
+  for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
   {
-    // C++ is insane...
-    std::vector<std::string>::iterator it = \
-      std::find(joint_state_.name.begin(),
-                joint_state_.name.end(), ref_joint_state_.name[i]);
-    size_t index = std::distance(joint_state_.name.begin(), it);
-    if (index == joint_state_.name.size())
-    {
-      continue;
-    }
-    ref_joint_state_.position[i] = joint_state_.position[index] + msg->displacement[i];
-  }
-  trajectory_msgs::JointTrajectoryPoint point;
-  point.positions = ref_joint_state_.position;
-  point.velocities.resize(ref_joint_state_.name.size());
-  point.accelerations.resize(ref_joint_state_.name.size());
-  point.time_from_start = ros::Duration(time_from_start_);
+    auto controller_name = it->first;
+    auto joint_names = it->second.joints;
 
-  if (use_action_)
-  {
+    trajectory_msgs::JointTrajectoryPoint point;
+    point.positions.resize(joint_names.size());
+    point.velocities.resize(joint_names.size());
+    point.accelerations.resize(joint_names.size());
+    point.time_from_start = ros::Duration(time_from_start_);
+
+    for (int i=0; i<joint_names.size(); i++)
+    {
+      size_t jog_index = std::distance(msg->name.begin(),
+                                       std::find(msg->name.begin(),
+                                                 msg->name.end(), joint_names[i]));
+      if (jog_index < 0)
+      {
+        continue;
+      }
+      size_t state_index = std::distance(joint_state_.name.begin(),
+                                         std::find(joint_state_.name.begin(),
+                                                   joint_state_.name.end(), joint_names[i]));
+      if (state_index < 0)
+      {
+        ROS_ERROR_STREAM("Cannot find joint in joint_states: " << joint_names[i]);
+      }
+      point.positions[i] = joint_state_.position[state_index] + msg->displacement[jog_index];
+      point.velocities[i] = 0.0;
+      point.accelerations[i] = 0.0;
+    }
+    if (use_action_)
+    {
       control_msgs::FollowJointTrajectoryGoal goal;
       goal.trajectory.header.stamp = ros::Time::now();
       goal.trajectory.header.frame_id = "base_link";
-      goal.trajectory.joint_names = ref_joint_state_.name;
+      goal.trajectory.joint_names = joint_names;
       goal.trajectory.points.push_back(point);
-      traj_client_->sendGoal(goal);
-  }
-  else
-  {
-    trajectory_msgs::JointTrajectory traj;
-    traj.header.stamp = ros::Time::now() + ros::Duration(0.01);
-    traj.header.frame_id = "base_link";
-    traj.joint_names = ref_joint_state_.name;
-    traj.points.push_back(point);
-    traj_pub_.publish(traj);
+
+      traj_clients_[controller_name]->sendGoal(goal);
+    }
+    else
+    {
+      trajectory_msgs::JointTrajectory traj;
+      traj.header.stamp = ros::Time::now();
+      traj.header.frame_id = "base_link";
+      traj.joint_names = joint_names;
+      traj.points.push_back(point);
+      
+      traj_pubs_[controller_name].publish(traj);
+    }
   }
 }
 
@@ -109,7 +243,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "jog_joint_node");
   jog_joint::JogJointNode node;
 
-  ros::Rate loop_rate(100);
+  ros::Rate loop_rate(10);
   while ( ros::ok() )
   {
     ros::spinOnce();

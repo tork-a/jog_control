@@ -211,7 +211,7 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
     return;
   }
   
-  // Make trajectory message for each controller
+  // Publish trajectory message for each controller
   for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
   {
     std::vector<double> positions, velocities, accelerations;

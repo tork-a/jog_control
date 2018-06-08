@@ -161,9 +161,9 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   
   ref_pose.header.frame_id = msg->header.frame_id;
   ref_pose.header.stamp = ros::Time::now();
-  ref_pose.pose.position.x = act_pose.position.x + msg->linear.x;
-  ref_pose.pose.position.y = act_pose.position.y + msg->linear.y;
-  ref_pose.pose.position.z = act_pose.position.z + msg->linear.z;
+  ref_pose.pose.position.x = act_pose.position.x + msg->linear_delta.x;
+  ref_pose.pose.position.y = act_pose.position.y + msg->linear_delta.y;
+  ref_pose.pose.position.z = act_pose.position.z + msg->linear_delta.z;
   
   ref_pose.pose.orientation.x = act_pose.orientation.x;
   ref_pose.pose.orientation.y = act_pose.orientation.y;

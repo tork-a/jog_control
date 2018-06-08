@@ -118,16 +118,16 @@ void JogJointPanel::publish()
   msg.header.stamp = ros::Time::now();
   msg.header.frame_id = frame_id_;
 
-  msg.name.resize(jog_joint_num_);
+  msg.joint_names.resize(jog_joint_num_);
   for (int i=0; i<jog_joint_num_; i++)
   {
-    msg.name[i] = joint_label_[i]->text().toUtf8().constData();
+    msg.joint_names[i] = joint_label_[i]->text().toUtf8().constData();
   }
     
-  msg.displacement.resize(jog_slider_.size());
+  msg.deltas.resize(jog_slider_.size());
   for (int i=0; i<jog_slider_.size(); i++)
   {
-    msg.displacement[i] = 0.1 * jog_slider_[i]->value() / jog_slider_[i]->maximum();
+    msg.deltas[i] = 0.1 * jog_slider_[i]->value() / jog_slider_[i]->maximum();
   }
   if(jog_button_->isChecked())
   {

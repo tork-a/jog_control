@@ -158,7 +158,7 @@ JogJointNode::JogJointNode()
  */
 void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
 {
-  if (msg->name.size() != msg->displacement.size())
+  if (msg->joint_names.size() != msg->deltas.size())
   {
     ROS_ERROR("Size mismatch of joint_names and deltas");
     return;
@@ -177,9 +177,9 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
 
     for (int i=0; i<joint_names.size(); i++)
     {
-      size_t jog_index = std::distance(msg->name.begin(),
-                                       std::find(msg->name.begin(),
-                                                 msg->name.end(), joint_names[i]));
+      size_t jog_index = std::distance(msg->joint_names.begin(),
+                                       std::find(msg->joint_names.begin(),
+                                                 msg->joint_names.end(), joint_names[i]));
       if (jog_index < 0)
       {
         continue;
@@ -191,7 +191,7 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
       {
         ROS_ERROR_STREAM("Cannot find joint in joint_states: " << joint_names[i]);
       }
-      point.positions[i] = joint_state_.position[state_index] + msg->displacement[jog_index];
+      point.positions[i] = joint_state_.position[state_index] + msg->deltas[jog_index];
       point.velocities[i] = 0.0;
       point.accelerations[i] = 0.0;
     }

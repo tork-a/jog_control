@@ -210,15 +210,15 @@ void JogFramePanel::publish()
   
   if (axis_id_ == "x")
   {
-    msg.linear.x = jog_value_;
+    msg.linear_delta.x = jog_value_;
   }
   if (axis_id_ == "y")
   {
-    msg.linear.y = jog_value_;
+    msg.linear_delta.y = jog_value_;
   }
   if (axis_id_ == "z")
   {
-    msg.linear.z = jog_value_;
+    msg.linear_delta.z = jog_value_;
   }
 
   if(jog_button_->isChecked())

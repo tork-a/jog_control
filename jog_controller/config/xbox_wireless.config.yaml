@@ -1,0 +1,22 @@
+enable_button: 4 # Left trigger button
+angular_button: 5 # Right trigger button
+
+axis_linear:
+  x: 0
+  y: 1
+  z: 4
+
+scale_linear:
+  x: -0.05
+  y: 0.05
+  z: 0.05
+  
+axis_angular:
+  x: 0
+  y: 1
+  z: 4
+  
+scale_angular:
+  x: -0.05
+  y: 0.05
+  z: 0.05

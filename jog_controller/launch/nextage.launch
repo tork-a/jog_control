@@ -1,8 +1,16 @@
 <launch>
+  <arg name="use_joy" value="true"/>
+  
   <include file="$(find nextage_moveit_config)/launch/moveit_planning_execution.launch"/>
 
   <rosparam command="load" file="$(find jog_controller)/config/nextage_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
 
+  <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
+    <arg name="group_name" value="left_arm"/>
+    <arg name="frame_id" value="WAIST"/>
+    <arg name="link_name" value="LARM_JOINT5_Link"/>
+  </include>
+  
 </launch>

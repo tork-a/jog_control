@@ -1,0 +1,22 @@
+<launch>
+  <arg name="joy_config" default="xbox_wireless"/>
+  <arg name="joy_dev" default="/dev/input/js0"/>
+  <arg name="group_name" default="manipulator"/>
+  <arg name="link_name" default="tool0"/>
+  <arg name="frame_id" default="base_link"/>
+  
+  <node name="joy" pkg="joy" type="joy_node">
+    <param name="dev" value="$(arg joy_dev)"/>
+    <param name="autorepeat_rate" value="10"/>
+    <param name="deadzone" value="0.2"/>
+  </node>
+  
+  <node name="joy_to_jog_frame" pkg="jog_controller" type="joy_to_jog_frame.py">
+    <rosparam command="load"
+	      file="$(find jog_controller)/config/$(arg joy_config).config.yaml"/>
+    <param name="group_name" value="$(arg group_name)"/>
+    <param name="link_name" value="$(arg link_name)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+  </node>
+
+</launch>

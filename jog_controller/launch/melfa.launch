@@ -1,4 +1,6 @@
 <launch>
+  <arg name="use_joy" value="true"/>
+  
   <include file="$(find melfa_driver)/launch/melfa_driver.launch">
     <arg name="loopback" value="true"/>
   </include>
@@ -10,4 +12,9 @@
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
 
+  <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
+    <arg name="group_name" value="arm"/>
+    <arg name="link_name" value="link6"/>
+  </include>
+  
 </launch>

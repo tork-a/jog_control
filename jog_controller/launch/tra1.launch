@@ -1,4 +1,6 @@
 <launch>
+  <arg name="use_joy" value="true"/>
+
   <!-- Launch loopback controller -->
   <include file="$(find tra1_bringup)/launch/tra1_bringup.launch">
     <arg name="simulation" value="true"/>
@@ -13,4 +15,10 @@
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
 
+  <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
+    <arg name="group_name" value="manipulator"/>
+    <arg name="frame_id" value="base_link"/>
+    <arg name="link_name" value="link_j6"/>
+  </include>
+  
 </launch>

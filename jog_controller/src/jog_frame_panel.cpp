@@ -32,36 +32,36 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   }
   
   QHBoxLayout* enable_layout = new QHBoxLayout;
-  enable_layout->addWidget( new QLabel( "Jog Enable:" ));
+  enable_layout->addWidget( new QLabel( "Jog Enable:" ), 1);
   jog_button_ = new QPushButton("OFF");
   jog_button_->setStyleSheet("QPushButton:checked { background-color: red; }\n");
   jog_button_->setCheckable(true);
   jog_button_->setChecked(false);
-  enable_layout->addWidget(jog_button_);
+  enable_layout->addWidget(jog_button_, 3);
 
   QHBoxLayout* group_layout = new QHBoxLayout;
-  group_layout->addWidget( new QLabel( "Group:" ));
+  group_layout->addWidget( new QLabel( "Group:" ), 1);
   group_cbox_ = new QComboBox();
   updateGroups();
-  group_layout->addWidget(group_cbox_);
+  group_layout->addWidget(group_cbox_, 3);
 
   QHBoxLayout* frame_layout = new QHBoxLayout;
-  frame_layout->addWidget( new QLabel( "Frame:" ));
+  frame_layout->addWidget( new QLabel( "Frame:" ), 1);
   frame_cbox_ = new QComboBox();
-  frame_layout->addWidget(frame_cbox_);
+  frame_layout->addWidget(frame_cbox_, 3);
 
   QHBoxLayout* target_layout = new QHBoxLayout;
-  target_layout->addWidget( new QLabel( "Target:" ));
+  target_layout->addWidget( new QLabel( "Target:" ), 1);
   target_link_cbox_ = new QComboBox();
-  target_layout->addWidget(target_link_cbox_);
+  target_layout->addWidget(target_link_cbox_, 3);
 
   QHBoxLayout* axis_layout = new QHBoxLayout;
-  axis_layout->addWidget( new QLabel( "Position Axis:" ));
+  axis_layout->addWidget( new QLabel( "Pos Axis:" ), 1);
   axis_cbox_ = new QComboBox();
-  axis_layout->addWidget(axis_cbox_);
+  axis_layout->addWidget(axis_cbox_, 3);
 
-  QHBoxLayout* jog_layout = new QHBoxLayout;
-  jog_layout->addWidget( new QLabel( "Jog:" ));
+  QHBoxLayout* pos_jog_layout = new QHBoxLayout;
+  pos_jog_layout->addWidget( new QLabel( "Pos Jog:" ), 1);
   jog_slider_ = new QSlider(Qt::Horizontal);
   jog_slider_->setTickPosition(QSlider::TicksBelow);
   jog_slider_->setTickInterval(500);
@@ -83,15 +83,30 @@ JogFramePanel::JogFramePanel(QWidget* parent)
                              "QSlider::add-page {"
                              "background: rgb(223, 70, 70);"
                              "} ");
-  jog_layout->addWidget(jog_slider_);
+  pos_jog_layout->addWidget(jog_slider_, 3);
+
+  QHBoxLayout* pos_x_layout = new QHBoxLayout;
+  pos_x_layout->addWidget( new QLabel( "Pos X:" ), 1);
+  pos_x_text_ = makeNumericLabel();
+  pos_x_layout->addWidget(pos_x_text_, 3);
+
+  QHBoxLayout* pos_y_layout = new QHBoxLayout;
+  pos_y_layout->addWidget( new QLabel( "Pos Y:" ), 1);
+  pos_y_text_ = makeNumericLabel();
+  pos_y_layout->addWidget(pos_y_text_, 3);
+
+  QHBoxLayout* pos_z_layout = new QHBoxLayout;
+  pos_z_layout->addWidget( new QLabel( "Pos Z:" ), 1);
+  pos_z_text_ = makeNumericLabel();
+  pos_z_layout->addWidget(pos_z_text_, 3);
 
   QHBoxLayout* ori_axis_layout = new QHBoxLayout;
-  ori_axis_layout->addWidget( new QLabel( "Orientation Axis:" ));
+  ori_axis_layout->addWidget( new QLabel( "Rot Axis:" ), 1);
   ori_axis_cbox_ = new QComboBox();
-  ori_axis_layout->addWidget(ori_axis_cbox_);
+  ori_axis_layout->addWidget(ori_axis_cbox_, 3);
 
   QHBoxLayout* ori_jog_layout = new QHBoxLayout;
-  ori_jog_layout->addWidget( new QLabel( "Orientation Jog:" ));
+  ori_jog_layout->addWidget( new QLabel( "Rot Jog:" ), 1);
   ori_jog_slider_ = new QSlider(Qt::Horizontal);
   ori_jog_slider_->setTickPosition(QSlider::TicksBelow);
   ori_jog_slider_->setTickInterval(500);
@@ -113,36 +128,38 @@ JogFramePanel::JogFramePanel(QWidget* parent)
                                  "QSlider::add-page {"
                                  "background: rgb(223, 70, 70);"
                                  "} ");
-  ori_jog_layout->addWidget(ori_jog_slider_);
+  ori_jog_layout->addWidget(ori_jog_slider_, 3);
 
+  QHBoxLayout* rot_x_layout = new QHBoxLayout;
+  rot_x_layout->addWidget( new QLabel( "Roll:" ), 1);
+  rot_x_text_ = makeNumericLabel();
+  rot_x_layout->addWidget(rot_x_text_, 3);
 
-  QHBoxLayout* pos_x_layout = new QHBoxLayout;
-  pos_x_layout->addWidget( new QLabel( "X:" ));
-  pos_x_text_ = makeNumericLabel();
-  pos_x_layout->addWidget(pos_x_text_);
+  QHBoxLayout* rot_y_layout = new QHBoxLayout;
+  rot_y_layout->addWidget( new QLabel( "Pitch:" ), 1);
+  rot_y_text_ = makeNumericLabel();
+  rot_y_layout->addWidget(rot_y_text_, 3);
 
-  QHBoxLayout* pos_y_layout = new QHBoxLayout;
-  pos_y_layout->addWidget( new QLabel( "Y:" ));
-  pos_y_text_ = makeNumericLabel();
-  pos_y_layout->addWidget(pos_y_text_);
-
-  QHBoxLayout* pos_z_layout = new QHBoxLayout;
-  pos_z_layout->addWidget( new QLabel( "Z:" ));
-  pos_z_text_ = makeNumericLabel();
-  pos_z_layout->addWidget(pos_z_text_);
-
+  QHBoxLayout* rot_z_layout = new QHBoxLayout;
+  rot_z_layout->addWidget( new QLabel( "Yaw:" ), 1);
+  rot_z_text_ = makeNumericLabel();
+  rot_z_layout->addWidget(rot_z_text_, 3);
+  
   QVBoxLayout* layout = new QVBoxLayout;
   layout->addLayout(enable_layout);
   layout->addLayout(group_layout);
   layout->addLayout(frame_layout);
   layout->addLayout(target_layout);
   layout->addLayout(axis_layout);
-  layout->addLayout(jog_layout);
+  layout->addLayout(pos_jog_layout);
   layout->addLayout(ori_axis_layout);
   layout->addLayout(ori_jog_layout);
   layout->addLayout(pos_x_layout);
   layout->addLayout(pos_y_layout);
   layout->addLayout(pos_z_layout);
+  layout->addLayout(rot_x_layout);
+  layout->addLayout(rot_y_layout);
+  layout->addLayout(rot_z_layout);
   setLayout(layout);
 
   connect(jog_button_, SIGNAL(toggled(bool)), this, SLOT(respondEnable(bool)));
@@ -185,6 +202,15 @@ void JogFramePanel::update()
   fillNumericLabel(pos_x_text_, transform.getOrigin().x());
   fillNumericLabel(pos_y_text_, transform.getOrigin().y());
   fillNumericLabel(pos_z_text_, transform.getOrigin().z());
+
+  // RPY
+  tf::Quaternion q = transform.getRotation();
+  tf::Matrix3x3 m(q);
+  double roll, pitch, yaw;
+  m.getRPY(roll, pitch, yaw);
+  fillNumericLabel(rot_x_text_, roll);
+  fillNumericLabel(rot_y_text_, pitch);
+  fillNumericLabel(rot_z_text_, yaw);
 }
 
 void JogFramePanel::updateGroups()
@@ -376,7 +402,7 @@ QLineEdit* JogFramePanel::makeNumericLabel()
 
 void JogFramePanel::fillNumericLabel( QLineEdit* label, double value )
 {
-  label->setText( QString::number( value, 'f', 2 ));
+  label->setText( QString::number( value, 'f', 4 ));
 }
 
 }  // namespace jog_controller

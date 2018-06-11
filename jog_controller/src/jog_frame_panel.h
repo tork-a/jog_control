@@ -52,6 +52,9 @@ class JogFramePanel: public rviz::Panel
     QLineEdit* pos_x_text_;
     QLineEdit* pos_y_text_;
     QLineEdit* pos_z_text_;
+    QLineEdit* rot_x_text_;
+    QLineEdit* rot_y_text_;
+    QLineEdit* rot_z_text_;
     std::vector<std::string> group_names_;
     std::vector<std::string> link_names_;
     std::string frame_id_;

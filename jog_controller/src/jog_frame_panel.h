@@ -33,8 +33,11 @@ class JogFramePanel: public rviz::Panel
     void respondFrame(int index);
     void respondTargetLink(int index);
     void respondAxis(int index);
+    void respondOrientationAxis(int index);
     void respondSliderChanged(int value);
     void respondSliderReleased();
+    void respondOrientationSliderChanged(int value);
+    void respondOrientationSliderReleased();
     void publish();
     
   protected:
@@ -43,7 +46,9 @@ class JogFramePanel: public rviz::Panel
     QComboBox* frame_cbox_;
     QComboBox* target_link_cbox_;
     QComboBox* axis_cbox_;
+    QComboBox* ori_axis_cbox_;
     QSlider* jog_slider_;
+    QSlider* ori_jog_slider_;
     QLineEdit* pos_x_text_;
     QLineEdit* pos_y_text_;
     QLineEdit* pos_z_text_;
@@ -52,12 +57,15 @@ class JogFramePanel: public rviz::Panel
     std::string frame_id_;
     std::string target_link_id_;
     std::string axis_id_;
+    std::string ori_axis_id_;
     boost::mutex mutex_;
     double jog_value_;
+    double ori_jog_value_;
     ros::Publisher jog_frame_pub_;
 
     void initFrameComboBox();
     void initAxisComboBox();
+    void initOrientationAxisComboBox();
 
     QLineEdit* makeNumericLabel();
     void fillNumericLabel( QLineEdit* label, double value );

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ros/ros.h>
+#include <tf/tf.h>
 #include <jog_msgs/JogFrame.h>
 #include <sensor_msgs/JointState.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>

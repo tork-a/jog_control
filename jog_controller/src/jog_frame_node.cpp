@@ -1,3 +1,4 @@
+#include <cfloat>
 #include <jog_controller/jog_frame_node.h>
 
 namespace jog_frame {
@@ -164,12 +165,31 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   ref_pose.pose.position.x = act_pose.position.x + msg->linear_delta.x;
   ref_pose.pose.position.y = act_pose.position.y + msg->linear_delta.y;
   ref_pose.pose.position.z = act_pose.position.z + msg->linear_delta.z;
-  
-  ref_pose.pose.orientation.x = act_pose.orientation.x;
-  ref_pose.pose.orientation.y = act_pose.orientation.y;
-  ref_pose.pose.orientation.z = act_pose.orientation.z;
-  ref_pose.pose.orientation.w = act_pose.orientation.w;
-  
+
+  // Apply orientation jog
+  tf::Quaternion q_ref, q_act, q_jog;
+  tf::quaternionMsgToTF(act_pose.orientation, q_act);
+  double angle = sqrt(msg->angular_delta.x*msg->angular_delta.x +
+                      msg->angular_delta.y*msg->angular_delta.y +
+                      msg->angular_delta.z*msg->angular_delta.z);
+  tf::Vector3 axis(0,0,1);
+  if (fabs(angle) < DBL_EPSILON)
+  {
+    angle = 0.0;
+  }
+  else
+  {
+    axis.setX(msg->angular_delta.x/angle);
+    axis.setY(msg->angular_delta.y/angle);
+    axis.setZ(msg->angular_delta.z/angle);
+  }
+  //ROS_INFO_STREAM("axis: " << axis.x() << ", " << axis.y() << ", " << axis.z());
+  //ROS_INFO_STREAM("angle: " << angle);
+
+  q_jog.setRotation(axis, angle);
+  q_ref = q_jog*q_act;
+  quaternionTFToMsg(q_ref, ref_pose.pose.orientation);
+
   ik.request.ik_request.pose_stamped = ref_pose;
 
   // ROS_INFO_STREAM("ik:\n" << ik.request);

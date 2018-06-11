@@ -14,7 +14,7 @@ namespace jog_controller
 {
 
 JogFramePanel::JogFramePanel(QWidget* parent)
-  : rviz::Panel(parent), jog_value_(0)
+  : rviz::Panel(parent), jog_value_(0), ori_jog_value_(0)
 {
   ros::NodeHandle nh;
   jog_frame_pub_ = nh.advertise<jog_msgs::JogFrame>( "jog_frame", 1);
@@ -56,7 +56,7 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   target_layout->addWidget(target_link_cbox_);
 
   QHBoxLayout* axis_layout = new QHBoxLayout;
-  axis_layout->addWidget( new QLabel( "Axis:" ));
+  axis_layout->addWidget( new QLabel( "Position Axis:" ));
   axis_cbox_ = new QComboBox();
   axis_layout->addWidget(axis_cbox_);
 
@@ -85,6 +85,37 @@ JogFramePanel::JogFramePanel(QWidget* parent)
                              "} ");
   jog_layout->addWidget(jog_slider_);
 
+  QHBoxLayout* ori_axis_layout = new QHBoxLayout;
+  ori_axis_layout->addWidget( new QLabel( "Orientation Axis:" ));
+  ori_axis_cbox_ = new QComboBox();
+  ori_axis_layout->addWidget(ori_axis_cbox_);
+
+  QHBoxLayout* ori_jog_layout = new QHBoxLayout;
+  ori_jog_layout->addWidget( new QLabel( "Orientation Jog:" ));
+  ori_jog_slider_ = new QSlider(Qt::Horizontal);
+  ori_jog_slider_->setTickPosition(QSlider::TicksBelow);
+  ori_jog_slider_->setTickInterval(500);
+  ori_jog_slider_->setMinimum(-1000);
+  ori_jog_slider_->setMaximum( 1000);
+  ori_jog_slider_->setTracking(true);
+  ori_jog_slider_->setSingleStep(0);
+  ori_jog_slider_->setPageStep(0);
+  // How can I change the slider style more properly??
+  ori_jog_slider_->setStyleSheet("QSlider::handle {"
+                                 "background: white;"
+                                 "border: 3px solid black;"
+                                 "width: 60px;"
+                                 "margin: -30px 0;"
+                                 "} "
+                                 "QSlider::sub-page {"
+                                 "background: rgb(164, 192, 2);"
+                                 "} "
+                                 "QSlider::add-page {"
+                                 "background: rgb(223, 70, 70);"
+                                 "} ");
+  ori_jog_layout->addWidget(ori_jog_slider_);
+
+
   QHBoxLayout* pos_x_layout = new QHBoxLayout;
   pos_x_layout->addWidget( new QLabel( "X:" ));
   pos_x_text_ = makeNumericLabel();
@@ -107,6 +138,8 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   layout->addLayout(target_layout);
   layout->addLayout(axis_layout);
   layout->addLayout(jog_layout);
+  layout->addLayout(ori_axis_layout);
+  layout->addLayout(ori_jog_layout);
   layout->addLayout(pos_x_layout);
   layout->addLayout(pos_y_layout);
   layout->addLayout(pos_z_layout);
@@ -116,10 +149,13 @@ JogFramePanel::JogFramePanel(QWidget* parent)
   connect(frame_cbox_, SIGNAL(activated(int)), this, SLOT(respondFrame(int)));
   connect(target_link_cbox_, SIGNAL(activated(int)), this, SLOT(respondTargetLink(int)));
   connect(axis_cbox_, SIGNAL(activated(int)), this, SLOT(respondAxis(int)));
+  connect(ori_axis_cbox_, SIGNAL(activated(int)), this, SLOT(respondOrientationAxis(int)));
 
   // Slider
   connect(jog_slider_, SIGNAL(valueChanged(int)), this, SLOT(respondSliderChanged(int)));
   connect(jog_slider_, SIGNAL(sliderReleased()), this, SLOT(respondSliderReleased()));
+  connect(ori_jog_slider_, SIGNAL(valueChanged(int)), this, SLOT(respondOrientationSliderChanged(int)));
+  connect(ori_jog_slider_, SIGNAL(sliderReleased()), this, SLOT(respondOrientationSliderReleased()));
 
   // Timer for update Frame ComboBox
   QTimer* output_timer = new QTimer( this );
@@ -133,6 +169,7 @@ void JogFramePanel::onInitialize()
   updateFrame();
   updateTargetLink();
   initAxisComboBox();
+  initOrientationAxisComboBox();
 }
 
 void JogFramePanel::update()
@@ -220,6 +257,19 @@ void JogFramePanel::publish()
   {
     msg.linear_delta.z = jog_value_;
   }
+  // Orientation jogging
+  if (ori_axis_id_ == "x")
+  {
+    msg.angular_delta.x = ori_jog_value_;
+  }
+  if (ori_axis_id_ == "y")
+  {
+    msg.angular_delta.y = ori_jog_value_;
+  }
+  if (ori_axis_id_ == "z")
+  {
+    msg.angular_delta.z = ori_jog_value_;
+  }
 
   if(jog_button_->isChecked())
   {
@@ -260,6 +310,13 @@ void JogFramePanel::respondAxis(int index)
   ROS_INFO_STREAM("respondAxis: " << axis_id_);
 }
 
+void JogFramePanel::respondOrientationAxis(int index)
+{
+  boost::mutex::scoped_lock lock(mutex_);
+  ori_axis_id_ = ori_axis_cbox_->currentText().toStdString();
+  ROS_INFO_STREAM("respondOrientationAxis: " << ori_axis_id_);
+}
+
 void JogFramePanel::respondSliderChanged(int value)
 {
   boost::mutex::scoped_lock lock(mutex_);
@@ -269,6 +326,17 @@ void JogFramePanel::respondSliderChanged(int value)
 void JogFramePanel::respondSliderReleased()
 {
   jog_slider_->setValue(0);
+}
+
+void JogFramePanel::respondOrientationSliderChanged(int value)
+{
+  boost::mutex::scoped_lock lock(mutex_);
+  ori_jog_value_ = 0.05 * value / 1000.0;
+}
+
+void JogFramePanel::respondOrientationSliderReleased()
+{
+  ori_jog_slider_->setValue(0);
 }
 
 void JogFramePanel::save(rviz::Config config) const
@@ -288,6 +356,15 @@ void JogFramePanel::initAxisComboBox()
   axis_cbox_->addItem("z");
   axis_cbox_->setCurrentIndex(0);
   axis_id_ = axis_cbox_->currentText().toStdString();
+}
+
+void JogFramePanel::initOrientationAxisComboBox()
+{
+  ori_axis_cbox_->addItem("x");
+  ori_axis_cbox_->addItem("y");
+  ori_axis_cbox_->addItem("z");
+  ori_axis_cbox_->setCurrentIndex(0);
+  ori_axis_id_ = ori_axis_cbox_->currentText().toStdString();
 }
 
 QLineEdit* JogFramePanel::makeNumericLabel()

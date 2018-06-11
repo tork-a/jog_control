@@ -20,6 +20,15 @@ typedef actionlib::SimpleActionClient < control_msgs::FollowJointTrajectoryActio
 namespace jog_frame
 {
 
+typedef struct
+{
+public:
+  std::string action_ns;
+  std::string type;
+  std::vector<std::string> joints;
+  
+} Controller;
+
 /**
  * Class JogFrameNode - Provides the jog_frame
  */
@@ -32,16 +41,18 @@ namespace jog_frame
     JogFrameNode ();
     void jog_frame_cb (jog_msgs::JogFrameConstPtr msg);
     void joint_state_cb (sensor_msgs::JointStateConstPtr msg);
+    int get_controller_list();
 
   protected:
-    ros::NodeHandle nh_;
+    std::map<std::string, Controller> cinfo_map_;
+    std::map<std::string, TrajClient*> traj_clients_;
+    std::map<std::string,ros::Publisher> traj_pubs_;
+    
     ros::Subscriber joint_state_sub_, jog_frame_sub_;
     ros::ServiceClient fk_client_, ik_client_;
 
     double time_from_start_;
     bool use_action_;
-    TrajClient *traj_client_;
-    std::map<std::string,ros::Publisher> traj_pubs_;
 
     sensor_msgs::JointState joint_state_;
     geometry_msgs::PoseStamped pose_stamped_;

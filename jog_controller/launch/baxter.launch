@@ -27,9 +27,11 @@
   <rosparam command="load"
 	    file="$(find jog_controller)/config/baxter_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <param name="use_action" value="true"/>
     <remap from="joint_states" to="robot/joint_states"/>
   </node>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="use_action" value="true"/>
     <remap from="joint_states" to="robot/joint_states"/>
   </node>
 

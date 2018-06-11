@@ -3,78 +3,110 @@
 
 namespace jog_frame {
 
-JogFrameNode::JogFrameNode()
-  : nh_("~")
+int JogFrameNode::get_controller_list()
 {
-  joint_state_sub_ = nh_.subscribe("/joint_states", 1, &JogFrameNode::joint_state_cb, this);
-  jog_frame_sub_ = nh_.subscribe("/jog_frame", 1, &JogFrameNode::jog_frame_cb, this);
-  fk_client_ = nh_.serviceClient<moveit_msgs::GetPositionFK>("/compute_fk");  
-  ik_client_ = nh_.serviceClient<moveit_msgs::GetPositionIK>("/compute_ik");  
-  ros::topic::waitForMessage<sensor_msgs::JointState>("/joint_states");
+  ros::NodeHandle gnh;
 
-  std::string controller_name;
-  //nh_.param<std::string>("controller_name", controller_name, "joint_trajectory_controller");
-  nh_.param<std::string>("target_link", target_link_, "link_6");
-  nh_.param<std::string>("group", group_name_);
-  //nh_.param<std::vector <std::string> >("joint_names", joint_names_);
-  nh_.getParam("joint_names", joint_names_);
-  nh_.param<double>("time_from_start", time_from_start_, 0.5);
-  nh_.param<bool>("use_action", use_action_, false);
-
-  if (!nh_.hasParam("/move_group/controller_list"))
-  {
-    ROS_ERROR_STREAM("No controller_list specified.");
-  }
   // Get controller information from move_group/controller_list
-  XmlRpc::XmlRpcValue controller_list;
-  nh_.getParam("/move_group/controller_list", controller_list);
-
-  /* actually create each controller */
-  for (int i = 0; i < controller_list.size(); ++i)
+  if (!gnh.hasParam("move_group/controller_list"))
   {
-    if (!controller_list[i].hasMember("name") || !controller_list[i].hasMember("joints"))
+    ROS_ERROR_STREAM("move_group/controller_list is not specified.");
+    return -1;
+  }
+  XmlRpc::XmlRpcValue controller_list;
+  gnh.getParam("move_group/controller_list", controller_list);
+  for (int i = 0; i < controller_list.size(); i++)
+  {
+    if (!controller_list[i].hasMember("name"))
     {
-      ROS_ERROR_STREAM("Name and joints must be specifed for each controller");
-      continue;
+      ROS_ERROR("name must be specifed for each controller.");
+      return -1;
+    }
+    if (!controller_list[i].hasMember("joints"))
+    {
+      ROS_ERROR("joints must be specifed for each controller.");
+      return -1;
     }
     try
     {
+      // get name member
       std::string name = std::string(controller_list[i]["name"]);
-
+      // get action_ns member if exists
+      std::string action_ns = std::string("");
+      if (controller_list[i].hasMember("action_ns"))
+      {
+        action_ns = std::string(controller_list[i]["action_ns"]);
+      }
+      // get joints member
       if (controller_list[i]["joints"].getType() != XmlRpc::XmlRpcValue::TypeArray)
       {
-        ROS_ERROR_STREAM("The list of joints for controller " << name << " is not specified as an "
-                         "array");
-        continue;
+        ROS_ERROR_STREAM("joints for controller " << name << " is not specified as an array");
+        return -1;
       }
+      auto joints = controller_list[i]["joints"];
+      // Get type member
+      std::string type = std::string("FollowJointTrajectory");
       if (!controller_list[i].hasMember("type"))
       {
-        ROS_ERROR_STREAM("No type specified for controller " << name);
-        continue;
+        ROS_WARN_STREAM("type is not specifed for controller " << name << ", using default FollowJointTrajectory");
       }
-      std::string type = std::string(controller_list[i]["type"]);
-      if (type == "FollowJointTrajectory")
+      type = std::string(controller_list[i]["type"]);
+      if (type != "FollowJointTrajectory")
       {
-        joint_map_[name].resize(controller_list[i]["joints"].size());
-        for (int j = 0; j < joint_map_[name].size(); ++j)
-        {
-          joint_map_[name][j] = std::string(controller_list[i]["joints"][j]);
-          // controller_map_[std::string(controller_list[i]["joints"][j])] = name;
-        }
+        ROS_ERROR_STREAM("controller type " << type << " is not supported");
+        return -1;
+      }
+      // Create controller map
+      cinfo_map_[name].action_ns = action_ns;
+      cinfo_map_[name].joints.resize(joints.size());
+      for (int j = 0; j < cinfo_map_[name].joints.size(); ++j)
+      {
+        cinfo_map_[name].joints[j] = std::string(joints[j]);
       }
     }
     catch (...)
     {
       ROS_ERROR_STREAM("Caught unknown exception while parsing controller information");
+      return -1;
     }
   }
+  return 0;
+}
 
-  ROS_INFO_STREAM("controller_map:");
-  for (auto it=controller_map_.begin(); it!=controller_map_.end(); it++)
+JogFrameNode::JogFrameNode()
+{
+  ros::NodeHandle gnh, pnh("~");
+
+  std::string controller_name;
+  pnh.param<std::string>("target_link", target_link_, "link_6");
+  pnh.param<std::string>("group", group_name_);
+  pnh.param<double>("time_from_start", time_from_start_, 0.5);
+  pnh.param<bool>("use_action", use_action_, false);
+
+  if (get_controller_list() < 0)
   {
-    ROS_INFO_STREAM(it->first << "," << it->second);
+    ROS_ERROR("get_controller_list faild. Aborted.");
+    ros::shutdown();
+    return;
   }
+  ROS_INFO_STREAM("controller_list:");
+  for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+  {
+    auto cinfo = it->second;
+    ROS_INFO_STREAM("- " << it->first);
+    for (int i=0; i<cinfo.joints.size(); i++)
+    {
+      ROS_INFO_STREAM("  - " << cinfo.joints[i]);
+    }    
+  }  
 
+  // Create subscribers
+  joint_state_sub_ = gnh.subscribe("joint_states", 1, &JogFrameNode::joint_state_cb, this);
+  jog_frame_sub_ = gnh.subscribe("jog_frame", 1, &JogFrameNode::jog_frame_cb, this);
+  fk_client_ = gnh.serviceClient<moveit_msgs::GetPositionFK>("compute_fk");  
+  ik_client_ = gnh.serviceClient<moveit_msgs::GetPositionIK>("compute_ik");  
+  ros::topic::waitForMessage<sensor_msgs::JointState>("joint_states");
+  
 #if 0
   /* Get robot state */
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
@@ -92,13 +124,31 @@ JogFrameNode::JogFrameNode()
   
   if (use_action_)
   {
-    traj_client_ = new TrajClient(controller_name + "/joint_trajectory_action", true);
-    
-    while(!traj_client_->waitForServer(ros::Duration(60)))
+    // Create action client for each controller
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
     {
-      ROS_INFO_STREAM("Waiting for the joint_trajectory_action server");
+      auto controller_name = it->first;
+      auto controller_info = it->second;
+      auto action_name = controller_name + "/" + controller_info.action_ns;
+      
+      traj_clients_[controller_name] = new TrajClient(action_name, true);
     }
-    ROS_INFO_STREAM("Action server is ok!");
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+    {
+      auto controller_name = it->first;
+      auto controller_info = it->second;
+      auto action_name = controller_name + "/" + controller_info.action_ns;
+      
+      for(;;)
+      {
+        if (traj_clients_[controller_name]->waitForServer(ros::Duration(1)))
+        {
+          ROS_INFO_STREAM(action_name << " is ready.");
+          break;
+        }
+        ROS_WARN_STREAM("Waiting for " << action_name << " server...");
+      }
+    }
   }
   else
   {
@@ -106,7 +156,7 @@ JogFrameNode::JogFrameNode()
     for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
     {
       auto name = it->first;
-      traj_pubs_[name] = nh_.advertise<trajectory_msgs::JointTrajectory>("/" + name + "/command", 10);
+      traj_pubs_[name] = gnh.advertise<trajectory_msgs::JointTrajectory>(name + "/command", 10);
     }
   }
 }
@@ -232,11 +282,12 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   }
   
   // Publish trajectory message for each controller
-  for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+  for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
   {
-    std::vector<double> positions, velocities, accelerations;
-    auto joint_names = it->second;
     auto controller_name = it->first;
+    auto joint_names = it->second.joints;
+
+    std::vector<double> positions, velocities, accelerations;
 
     positions.resize(joint_names.size());
     velocities.resize(joint_names.size());
@@ -263,10 +314,9 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
       goal.trajectory.header.stamp = ros::Time::now();
       goal.trajectory.header.frame_id = "base_link";
       goal.trajectory.joint_names = joint_names;
-
       goal.trajectory.points.push_back(point);
-    
-      traj_client_->sendGoal(goal);
+
+      traj_clients_[controller_name]->sendGoal(goal);
     }
     else
     {

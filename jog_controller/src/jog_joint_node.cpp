@@ -120,7 +120,7 @@ JogJointNode::JogJointNode()
     {
       auto controller_name = it->first;
       auto controller_info = it->second;
-      std::string action_name = controller_name + controller_info.action_ns;
+      auto action_name = controller_name + "/" + controller_info.action_ns;
       
       traj_clients_[controller_name] = new TrajClient(action_name, true);
     }
@@ -128,7 +128,7 @@ JogJointNode::JogJointNode()
     {
       auto controller_name = it->first;
       auto controller_info = it->second;
-      auto action_name = controller_name + controller_info.action_ns;
+      auto action_name = controller_name + "/" + controller_info.action_ns;
       
       for(;;)
       {

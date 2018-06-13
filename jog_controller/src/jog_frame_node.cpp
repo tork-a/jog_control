@@ -153,10 +153,10 @@ JogFrameNode::JogFrameNode()
   else
   {
     // Create publisher for each controller
-    for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
     {
-      auto name = it->first;
-      traj_pubs_[name] = gnh.advertise<trajectory_msgs::JointTrajectory>(name + "/command", 10);
+      auto controller_name = it->first;
+      traj_pubs_[controller_name] = gnh.advertise<trajectory_msgs::JointTrajectory>(controller_name + "/command", 10);
     }
   }
 }

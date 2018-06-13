@@ -108,6 +108,7 @@ JogJointNode::JogJointNode()
     if (msg)
     {
       ROS_INFO_STREAM("joint_states message received.");
+      joint_state_ = *msg;
       break;
     }
     ROS_WARN_STREAM("Waiting for joint_states message...");

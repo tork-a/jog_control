@@ -5,6 +5,7 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
+  control_msgs
   jog_msgs
   moveit_core
   moveit_ros_planning
@@ -23,7 +24,7 @@ find_package(Boost REQUIRED system filesystem date_time thread)
 # catkin_python_setup()
 
 catkin_package(
-  CATKIN_DEPENDS actionlib jog_msgs
+  CATKIN_DEPENDS actionlib control_msgs jog_msgs
   moveit_core
   moveit_ros_planning
   moveit_visual_tools
@@ -112,4 +113,5 @@ if(CATKIN_ENABLE_TESTING)
   endforeach()
 
   add_rostest(test/tra1_jog.test ARGS use_rviz:=false)
+  add_rostest(test/nextage_jog.test ARGS use_rviz:=false)
 endif()

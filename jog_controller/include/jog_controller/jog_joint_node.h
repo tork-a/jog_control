@@ -29,28 +29,31 @@ public:
 /**
  * Class JogJointNode - Provides the jog_joint
  */
-  class JogJointNode
-  {
-  public:
+class JogJointNode
+{
+public:
   /**
    * @breif: Default constructor for JogJointNode Class.
    */
-    JogJointNode ();
-    int get_controller_list();
-    void jog_joint_cb (jog_msgs::JogJointConstPtr msg);
-    void joint_state_cb (sensor_msgs::JointStateConstPtr msg);
+  JogJointNode ();
+  int get_controller_list();
+  void jog_joint_cb (jog_msgs::JogJointConstPtr msg);
+  void joint_state_cb (sensor_msgs::JointStateConstPtr msg);
 
-  protected:
-    std::map<std::string, Controller> cinfo_map_;
-    std::map<std::string, TrajClient*> traj_clients_;
-    std::map<std::string, ros::Publisher> traj_pubs_;
+protected:
+  ros::Subscriber joint_state_sub_, jog_joint_sub_;
+    
+  std::map<std::string, Controller> cinfo_map_;
+  std::map<std::string, TrajClient*> traj_clients_;
+  std::map<std::string, ros::Publisher> traj_pubs_;
 
-    ros::Subscriber joint_state_sub_, jog_joint_sub_;
-    sensor_msgs::JointState joint_state_;
+  std::map<std::string, double> joint_map_;
+  // sensor_msgs::JointState joint_state_;
+    
 
-    double time_from_start_;
-    bool use_action_;
-  };
+  double time_from_start_;
+  bool use_action_;
+};
 
 } // namespace jog_joint
 

@@ -107,21 +107,6 @@ JogFrameNode::JogFrameNode()
   ik_client_ = gnh.serviceClient<moveit_msgs::GetPositionIK>("compute_ik");  
   ros::topic::waitForMessage<sensor_msgs::JointState>("joint_states");
   
-#if 0
-  /* Get robot state */
-  robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
-  robot_model::RobotModelPtr robot_model = robot_model_loader.getModel();
-  robot_state_ = new robot_state::RobotState(robot_model);
-  const robot_state::JointModelGroup* joint_group = robot_model->getJointModelGroup(group_name_);
-
-  /* Get all groups */
-  joint_groups_.resize(group_names_.size());
-  for (int i=0; i<joint_groups_.size(); i++)
-  {
-    joint_groups_[i] = robot_model->getJointModelGroup(group_names_[i]);
-  }
-#endif
-  
   if (use_action_)
   {
     // Create action client for each controller
@@ -167,6 +152,15 @@ JogFrameNode::JogFrameNode()
 */
 void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 {
+  // Update current joint state
+  sensor_msgs::JointState joint_state;
+  for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+  {
+    joint_state.name.push_back(it->first);
+    joint_state.position.push_back(it->second);
+    joint_state.velocity.push_back(0.0);
+    joint_state.effort.push_back(0.0);
+  }
   // Update forward kinematics
   moveit_msgs::GetPositionFK fk;
 
@@ -174,7 +168,7 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   fk.request.header.stamp = ros::Time::now();
   fk.request.fk_link_names.clear();
   fk.request.fk_link_names.push_back(msg->link_name);
-  fk.request.robot_state.joint_state = joint_state_;
+  fk.request.robot_state.joint_state = joint_state;
 
   if (fk_client_.call(fk))
   {
@@ -203,7 +197,7 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 
   ik.request.ik_request.group_name = msg->group_name;
   ik.request.ik_request.ik_link_name = msg->link_name;
-  ik.request.ik_request.robot_state.joint_state = joint_state_;
+  ik.request.ik_request.robot_state.joint_state = joint_state;
   //ik.request.ik_request.avoid_collisions = msg->avoid_collisions;
   ik.request.ik_request.avoid_collisions = true;
   
@@ -262,11 +256,11 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   double error = 0;
   for (int i=0; i<state.name.size(); i++)
   {
-    for (int j=0; j<joint_state_.name.size(); j++)
+    for (int j=0; j<joint_state.name.size(); j++)
     {
-      if (state.name[i] == joint_state_.name[j])
+      if (state.name[i] == joint_state.name[j])
       {
-        double e = fabs(state.position[i] - joint_state_.position[j]);
+        double e = fabs(state.position[i] - joint_state.position[j]);
         if (e > error)
         {
           error = e;
@@ -298,6 +292,10 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
       size_t index = std::distance(state.name.begin(),
                                    std::find(state.name.begin(),
                                              state.name.end(), joint_names[i]));
+      if (index == state.name.size())
+      {
+        ROS_WARN_STREAM("Cannot find joint " << joint_names[i] << " in IK solution");        
+      }
       positions[i] = state.position[index];
       velocities[i] = 0;
       accelerations[i] = 0;
@@ -338,12 +336,16 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 void JogFrameNode::joint_state_cb(sensor_msgs::JointStateConstPtr msg)
 {
   // Check that the msg contains joints
-  if (msg->name.empty())
+  if (msg->name.empty() || msg->name.size() != msg->position.size())
   {
-  ROS_ERROR("JogFrameNode::joint_state_cb - joint_state is empty.");
-  return;
+    ROS_WARN("Invalid JointState message");
+    return;
   }
-  joint_state_ = *msg;
+  // Update joint information
+  for (int i=0; i<msg->name.size(); i++)
+  {
+    joint_map_[msg->name[i]] = msg->position[i];
+  }
 }
 
 } // namespace jog_arm

@@ -1,0 +1,50 @@
+<!-- Launch file to test Baxter simulator -->
+<launch>
+  <arg name="use_rviz" default="true"/>
+
+  <!-- Load model file -->
+  <param name="robot_description" textfile="$(find baxter_description)/urdf/baxter.urdf" />
+
+  <node name="tfpub" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 world base 100"/>
+  
+  <!-- fake_joint_driver_node -->
+  <node name="fake_joint_driver" pkg="fake_joint_driver" type="fake_joint_driver_node">
+    <remap from="joint_states" to="/robot/joint_states"/>
+  </node>
+
+  <!-- robot_state_publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <remap from="joint_states" to="/robot/joint_states"/>
+  </node>
+
+  <!-- Load joint trajecotory controller -->
+  <rosparam file="$(find jog_controller)/config/baxter_controllers.yaml" />
+
+  <node name="controller_spawner"
+	pkg="controller_manager" type="spawner" respawn="false"
+	args="joint_state_controller robot/limb/right robot/limb/left"/> 
+
+  <!-- Launch MoveIt! -->
+  <include file="$(find baxter_moveit_config)/launch/planning_context.launch"/>
+  <include file="$(find baxter_moveit_config)/launch/move_group.launch">
+    <arg name="allow_trajectory_execution" value="true"/>
+  </include>
+  <node if="$(arg use_rviz)"
+	name="$(anon rviz)" pkg="rviz" type="rviz"
+	args="-d $(find baxter_moveit_config)/launch/moveit.rviz">
+    <rosparam command="load" file="$(find baxter_moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+  <!-- Launch jog_controllers -->
+  <include file="$(find jog_controller)/launch/baxter.launch">
+    <arg name="use_joy" value="false"/>
+  </include>	   
+
+  <!-- Run tests -->
+  <param name="baxter_hztest/topic" value="/robot/joint_states"/>
+  <param name="baxter_hztest/hz" value="100.0"/>
+  <param name="baxter_hztest/hzerror" value="15.0"/>
+  <param name="baxter_hztest/test_duration" value="5.0"/>  
+  <test test-name="baxter_hztest" pkg="rostest" type="hztest" name="baxter_hztest"/>
+
+</launch>

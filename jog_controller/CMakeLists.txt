@@ -114,5 +114,6 @@ if(CATKIN_ENABLE_TESTING)
   # endforeach()
 
   # add_rostest(test/tra1_jog.test ARGS use_rviz:=false)
+  # add_rostest(test/baxter_jog.test ARGS use_rviz:=false)
   add_rostest(test/nextage_jog.test ARGS use_rviz:=false)
 endif()

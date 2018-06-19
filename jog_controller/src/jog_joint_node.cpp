@@ -97,22 +97,8 @@ JogJointNode::JogJointNode()
   }  
   
   // Create subscribers
-  joint_state_sub_ = gnh.subscribe("joint_states", 1, &JogJointNode::joint_state_cb, this);
+  joint_state_sub_ = gnh.subscribe("joint_states", 10, &JogJointNode::joint_state_cb, this);
   jog_joint_sub_ = gnh.subscribe("jog_joint", 1, &JogJointNode::jog_joint_cb, this);
-
-  // Waiting for joint_states
-  for (;;)
-  {
-    sensor_msgs::JointStateConstPtr msg;
-    msg = ros::topic::waitForMessage<sensor_msgs::JointState>("joint_states", ros::Duration(1));
-    if (msg)
-    {
-      ROS_INFO_STREAM("joint_states message received.");
-      joint_state_ = *msg;
-      break;
-    }
-    ROS_WARN_STREAM("Waiting for joint_states message...");
-  }
 
   if (use_action_)
   {
@@ -159,10 +145,20 @@ JogJointNode::JogJointNode()
  */
 void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
 {
+  // Validate the message
   if (msg->joint_names.size() != msg->deltas.size())
   {
     ROS_ERROR("Size mismatch of joint_names and deltas");
     return;
+  }
+  // Update current joint state
+  sensor_msgs::JointState joint_state;
+  for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+  {
+    joint_state.name.push_back(it->first);
+    joint_state.position.push_back(it->second);
+    joint_state.velocity.push_back(0.0);
+    joint_state.effort.push_back(0.0);
   }
   // Publish trajectory message for each controller
   for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
@@ -181,18 +177,20 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
       size_t jog_index = std::distance(msg->joint_names.begin(),
                                        std::find(msg->joint_names.begin(),
                                                  msg->joint_names.end(), joint_names[i]));
-      if (jog_index < 0)
+      if (jog_index == msg->joint_names.size())
       {
+        ROS_INFO_STREAM("Cannot find joint in jog_joint: " << joint_names[i]);
         continue;
       }
-      size_t state_index = std::distance(joint_state_.name.begin(),
-                                         std::find(joint_state_.name.begin(),
-                                                   joint_state_.name.end(), joint_names[i]));
-      if (state_index < 0)
+      size_t state_index = std::distance(joint_state.name.begin(),
+                                         std::find(joint_state.name.begin(),
+                                                   joint_state.name.end(), joint_names[i]));
+      if (state_index == joint_state.name.size())
       {
-        ROS_ERROR_STREAM("Cannot find joint in joint_states: " << joint_names[i]);
+        ROS_ERROR_STREAM("Cannot find joint " << joint_names[i] << " in joint_states");
+        continue;
       }
-      point.positions[i] = joint_state_.position[state_index] + msg->deltas[jog_index];
+      point.positions[i] = joint_state.position[state_index] + msg->deltas[jog_index];
       point.velocities[i] = 0.0;
       point.accelerations[i] = 0.0;
     }
@@ -226,12 +224,16 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
 void JogJointNode::joint_state_cb(sensor_msgs::JointStateConstPtr msg)
 {
   // Check that the msg contains joints
-  if (msg->name.empty())
+  if (msg->name.empty() || msg->name.size() != msg->position.size())
   {
-    ROS_ERROR("JogJointNode::joint_state_cb - joint_state is empty.");
+    ROS_WARN("Invalid JointState message");
     return;
   }
-  joint_state_ = *msg;
+  // Update joint information
+  for (int i=0; i<msg->name.size(); i++)
+  {
+    joint_map_[msg->name[i]] = msg->position[i];
+  }
 }
 
 } // namespace jog_arm

@@ -32,44 +32,35 @@ public:
 /**
  * Class JogFrameNode - Provides the jog_frame
  */
-  class JogFrameNode
-  {
-  public:
+class JogFrameNode
+{
+public:
   /**
    * @breif: Default constructor for JogFrameNode Class.
    */
-    JogFrameNode ();
-    void jog_frame_cb (jog_msgs::JogFrameConstPtr msg);
-    void joint_state_cb (sensor_msgs::JointStateConstPtr msg);
-    int get_controller_list();
+  JogFrameNode ();
+  void jog_frame_cb (jog_msgs::JogFrameConstPtr msg);
+  void joint_state_cb (sensor_msgs::JointStateConstPtr msg);
+  int get_controller_list();
 
-  protected:
-    std::map<std::string, Controller> cinfo_map_;
-    std::map<std::string, TrajClient*> traj_clients_;
-    std::map<std::string,ros::Publisher> traj_pubs_;
-    
-    ros::Subscriber joint_state_sub_, jog_frame_sub_;
-    ros::ServiceClient fk_client_, ik_client_;
+protected:
+  ros::Subscriber joint_state_sub_, jog_frame_sub_;
+  ros::ServiceClient fk_client_, ik_client_;
 
-    double time_from_start_;
-    bool use_action_;
+  std::map<std::string, Controller> cinfo_map_;
+  std::map<std::string, TrajClient*> traj_clients_;
+  std::map<std::string,ros::Publisher> traj_pubs_;
 
-    sensor_msgs::JointState joint_state_;
-    geometry_msgs::PoseStamped pose_stamped_;
-    sensor_msgs::JointState ref_joint_state_;
-    std::string target_link_;
+  std::map<std::string, double> joint_map_;
+  geometry_msgs::PoseStamped pose_stamped_;
 
-    std::string group_name_;
+  double time_from_start_;
+  bool use_action_;
 
-    std::vector<std::string> joint_names_;
+  std::string target_link_;
+  std::string group_name_;
+};
 
-    robot_state::RobotState* robot_state_;
-    std::vector<robot_state::JointModelGroup*> joint_groups_;
+} // namespace jog_frame
 
-    std::map<std::string,std::string> controller_map_;
-    std::map<std::string,std::vector<std::string> > joint_map_;
-  };
-
-}                               // namespace jog_frame
-
-#endif                          // JOG_FRAME_NODE_H
+#endif // JOG_FRAME_NODE_H

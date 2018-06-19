@@ -5,6 +5,7 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
+  control_msgs
   jog_msgs
   moveit_core
   moveit_ros_planning
@@ -23,7 +24,7 @@ find_package(Boost REQUIRED system filesystem date_time thread)
 # catkin_python_setup()
 
 catkin_package(
-  CATKIN_DEPENDS actionlib jog_msgs
+  CATKIN_DEPENDS actionlib control_msgs jog_msgs
   moveit_core
   moveit_ros_planning
   moveit_visual_tools
@@ -93,3 +94,26 @@ install(FILES plugin_description.xml
 install(TARGETS jog_controller
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+# Tests
+if(CATKIN_ENABLE_TESTING)
+  find_package(roslint REQUIRED)
+  set(ROSLINT_CPP_OPTS "--filter=-runtime/references,-runtime/int")
+  # roslint_cpp(src/melfa_hardware_interface.cpp src/melfa_driver_node.cpp src/melfa_loopback_node.cpp)
+  set(ROSLINT_PYTHON_OPTS "--max-line-length=180")
+  # roslint_python(test/test_joint_trajectory_controller.py)
+  # add_dependencies(tests roslint)
+
+  find_package(roslaunch REQUIRED)
+  find_package(rostest REQUIRED)
+  # Remove tempolary for travis
+  # file(GLOB LAUNCH_FILES launch/*.launch)
+  # foreach(LAUNCH_FILE ${LAUNCH_FILES})
+  #   message(STATUS "Testing ${LAUNCH_FILE}")
+  #   roslaunch_add_file_check(${LAUNCH_FILE})
+  # endforeach()
+
+  # add_rostest(test/tra1_jog.test ARGS use_rviz:=false)
+  # add_rostest(test/baxter_jog.test ARGS use_rviz:=false)
+  add_rostest(test/nextage_jog.test ARGS use_rviz:=false)
+endif()

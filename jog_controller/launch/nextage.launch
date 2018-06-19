@@ -1,8 +1,7 @@
 <launch>
-  <arg name="use_joy" value="true"/>
+  <arg name="use_joy" default="false"/>
   
-  <include file="$(find nextage_moveit_config)/launch/moveit_planning_execution.launch"/>
-
+  <!-- Launch jog_controllers -->
   <rosparam command="load" file="$(find jog_controller)/config/nextage_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>

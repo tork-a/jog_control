@@ -13,6 +13,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>actionlib</depend>
+  <depend>control_msgs</depend>
   <depend>jog_msgs</depend>
   <depend>moveit_core</depend>
   <depend>moveit_ros_planning</depend>
@@ -23,6 +24,8 @@
   <exec_depend>ur_gazebo</exec_depend>
   <exec_depend>ur5_moveit_config</exec_depend>
   <exec_depend>tra1_bringup</exec_depend>
+  <exec_depend>nextage_ros_bridge</exec_depend>
+  <exec_depend>nextage_moveit_config</exec_depend>
 
   <export>
     <rviz plugin="${prefix}/plugin_description.xml"/>

@@ -23,9 +23,13 @@ keyboards, and teaching pendants using these packages.
 # Quick start
 
 You can see the idea of jog_control package by demo with simulation
-and MoveIt!.
+and MoveIt!. Some robots are from
+[ROS-Industrial repositry](https://github.com/ros-industrial), which
+you need to build from source code.
 
 ## UR5 
+
+![UR5 jog control](image/ur5_jog.png)
 
 Launch simulation and MoveIt!
 
@@ -41,9 +45,9 @@ And launch jog nodes.
 $ roslaunch jog_controller ur5.launch
 ```
 
-![UR5 jog control](image/ur5_jog.png)
-
 ## TRA1
+
+![TRA1 jog control](image/tra1_jog.png)
 
 Launch simulation and MoveIt!
 
@@ -58,9 +62,9 @@ And launch jog nodes.
 $ roslaunch jog_controller tra1.launch
 ```
 
-![TRA1 jog control](image/tra1_jog.png)
-
 ## Denso VS060
+
+![Denso VS060 jog control](image/vs060_jog.png)
 
 Launch simulation and MoveIt!
 
@@ -74,9 +78,9 @@ And launch jog nodes.
 $ roslaunch jog_controller vs060.launch
 ```
 
-![Denso VS060 jog control](image/vs060_jog.png)
-
 ## NEXTAGE Open
+
+![NEXTAGE Open jog control](image/nextage_jog.png)
 
 Launch simulation and MoveIt!
 
@@ -91,13 +95,9 @@ And launch jog nodes.
 $ roslaunch jog_controller nextage.launch
 ```
 
-![NEXTAGE Open jog control](image/nextage_jog.png)
-
-You can use robots on ROS-I repositry, if you build it from source
-code. See
-[ROS-Industrial repositry](https://github.com/ros-industrial).
-
 ## ABB IRB2400
+
+![ABB IRB2400 jog control](image/abb_irb2400_jog.png)
 
 (CAUTION: The model of this robot is a bit strange in joint limits.
 The jog may not move because of joints flipping.)
@@ -114,9 +114,9 @@ And launch jog nodes.
 $ roslaunch jog_controller abb_irb2400.launch 
 ```
 
-![ABB IRB2400 jog control](image/abb_irb2400_jog.png)
-
 ## MOTOMAN SIA20D
+
+![MOTOMAN SIA20D jog control](image/motoman_sia20d_jog.png)
 
 Launch simulation and MoveIt!
 
@@ -132,9 +132,9 @@ $ roslaunch jog_controller motoman_sia20d.launch
 
 ## MOTOMAN SDA10F
 
-This is another dual arm robot by Yaskawa MOTOMAN.
-
 ![MOTOMAN SDA10F jog control](image/motoman_sda10f_jog.png)
+
+This is another dual arm robot by Yaskawa MOTOMAN.
 
 Launch simulation and MoveIt!
 
@@ -174,7 +174,7 @@ TBA.
 
 # TODO
 
-- Orientation(pose) jogging (work in progress)
+- For precise jog and stability, joint position should updated only when the jog start
 - Wiser target picking (group name, target link, etc)
 - Marker visualization for target link and base link
 

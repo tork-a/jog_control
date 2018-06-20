@@ -22,3 +22,5 @@ jog_frame_node:
   link_names:
     - left_hand
     - right_hand
+  exclude_joint_names:
+    - head_nod

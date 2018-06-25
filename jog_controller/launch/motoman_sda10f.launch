@@ -1,18 +1,15 @@
 <launch>
   <arg name="use_joy" default="false"/>
-  
+
   <!-- Launch jog controllers -->
   <rosparam command="load"
-	    file="$(find jog_controller)/config/abb_irb2400_jog.yaml"/>
+	    file="$(find jog_controller)/config/motoman_sda10f_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
-    <param name="use_action" value="true"/>
-    <param name="time_from_start" value="1.0"/>
+    <remap from="command" to="joint_path_command"/>
   </node>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
-    <param name="use_action" value="true"/>
-    <param name="time_from_start" value="1.0"/>
+    <remap from="command" to="joint_path_command"/>
   </node>
-
   <!-- Launch joypad -->
   <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
     <arg name="group_name" value="manipulator"/>

@@ -1,7 +1,6 @@
 <launch>
-  <!-- Launch MoveIt! -->
-  <include file="$(find denso_launch)/launch/denso_vs060_moveit_demo_simulation.launch"/>
-  
+  <arg name="use_joy" default="false"/>
+
   <!-- Jog controllers -->
   <rosparam command="load"
 	    file="$(find jog_controller)/config/vs060_jog.yaml"/>
@@ -11,5 +10,12 @@
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
     <remap from="joint_states" to="arm_controller/joint_states"/>
   </node>
+
+  <!-- Launch joypad -->
+  <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
+    <arg name="group_name" value="manipulator"/>
+    <arg name="frame_id" value="base_link"/>
+    <arg name="link_name" value="Flange"/>
+  </include>
 
 </launch>

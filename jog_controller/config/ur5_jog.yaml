@@ -1,5 +1,4 @@
 jog_joint_node:
-  controller_name: arm_controller
   joint_names:
     - shoulder_pan_joint
     - shoulder_lift_joint
@@ -8,7 +7,13 @@ jog_joint_node:
     - wrist_2_joint
     - wrist_3_joint
 
-# UR5 moveit doesn't have controller name somehow    
+jog_frame_node:
+  group_names:
+    - manipulator
+  link_names:
+    - ee_link
+
+# Somehow, UR5 moveit doesn't have controller name, so specify here
 move_group:
   controller_list:
     - name: arm_controller
@@ -21,9 +26,3 @@ move_group:
         - wrist_1_joint
         - wrist_2_joint
         - wrist_3_joint
-
-jog_frame_node:
-  group_names:
-    - manipulator
-  link_names:
-    - ee_link

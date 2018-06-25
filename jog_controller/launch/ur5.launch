@@ -1,18 +1,16 @@
 <launch>
-  <include file="$(find ur_gazebo)/launch/ur5_joint_limited.launch"/>
-
-  <include file="$(find ur5_moveit_config)/launch/ur5_moveit_planning_execution.launch">
-    <arg name="sim" value="true"/>
-    <arg name="limited" value="false"/>
-  </include>
-
-  <include file="$(find ur5_moveit_config)/launch/moveit_rviz.launch">
-    <arg name="config" value="true"/>
-  </include>
+  <arg name="use_joy" default="false"/>
   
   <rosparam command="load"
 	    file="$(find jog_controller)/config/ur5_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
+
+  <!-- Launch joypad -->
+  <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
+    <arg name="group_name" value="manipulator"/>
+    <arg name="frame_id" value="base_link"/>
+    <arg name="link_name" value="link_ee"/>
+  </include>
 
 </launch>

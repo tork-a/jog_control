@@ -82,6 +82,8 @@ JogFrameNode::JogFrameNode()
   pnh.param<std::string>("group", group_name_);
   pnh.param<double>("time_from_start", time_from_start_, 0.5);
   pnh.param<bool>("use_action", use_action_, false);
+  // Exclude joint list
+  gnh.getParam("exclude_joint_names", exclude_joints_);
 
   if (get_controller_list() < 0)
   {
@@ -156,6 +158,13 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   sensor_msgs::JointState joint_state;
   for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
   {
+    // Exclude joint in exclude_joints_
+    if (std::find(exclude_joints_.begin(),
+                  exclude_joints_.end(), it->first) != exclude_joints_.end())
+    {
+      ROS_INFO_STREAM("joint " << it->first << "is excluded from FK");
+      continue;
+    }
     joint_state.name.push_back(it->first);
     joint_state.position.push_back(it->second);
     joint_state.velocity.push_back(0.0);

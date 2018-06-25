@@ -59,6 +59,7 @@ protected:
 
   std::string target_link_;
   std::string group_name_;
+  std::vector<std::string> exclude_joints_;
 };
 
 } // namespace jog_frame

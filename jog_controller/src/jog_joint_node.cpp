@@ -76,7 +76,7 @@ JogJointNode::JogJointNode()
 {
   ros::NodeHandle gnh, pnh("~");
 
-  pnh.param<double>("time_from_start", time_from_start_, 0.5);
+  pnh.param<double>("time_from_start", time_from_start_, 0.2);
   pnh.param<bool>("use_action", use_action_, false);
 
   if (get_controller_list() < 0)
@@ -97,8 +97,11 @@ JogJointNode::JogJointNode()
   }  
   
   // Create subscribers
-  joint_state_sub_ = gnh.subscribe("joint_states", 10, &JogJointNode::joint_state_cb, this);
-  jog_joint_sub_ = gnh.subscribe("jog_joint", 1, &JogJointNode::jog_joint_cb, this);
+  joint_state_sub_ = gnh.subscribe("joint_states", 20, &JogJointNode::joint_state_cb, this);
+  jog_joint_sub_ = gnh.subscribe("jog_joint", 20, &JogJointNode::jog_joint_cb, this);
+
+  // Reference joint_state publisher
+  joint_state_pub_ = pnh.advertise<sensor_msgs::JointState>("reference_joint_states", 10);
 
   if (use_action_)
   {
@@ -151,15 +154,30 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
     ROS_ERROR("Size mismatch of joint_names and deltas");
     return;
   }
-  // Update current joint state
-  sensor_msgs::JointState joint_state;
-  for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+  ROS_INFO_STREAM("msg:" << *msg);
+
+  // Update only if the stamp is older than last_samp_ + time_from_start
+  if (msg->header.stamp > last_stamp_ + ros::Duration(time_from_start_))
   {
-    joint_state.name.push_back(it->first);
-    joint_state.position.push_back(it->second);
-    joint_state.velocity.push_back(0.0);
-    joint_state.effort.push_back(0.0);
-  }
+    ROS_INFO("ref joint state updated");
+    // Update reference joint_state
+    joint_state_.name.clear();
+    joint_state_.position.clear();
+    joint_state_.velocity.clear();
+    joint_state_.effort.clear();
+    for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+    {
+      joint_state_.name.push_back(it->first);
+      joint_state_.position.push_back(it->second);
+      joint_state_.velocity.push_back(0.0);
+      joint_state_.effort.push_back(0.0);
+    }
+    // Publish reference joint state for debug
+    joint_state_pub_.publish(joint_state_);
+  }  
+  // Update timestamp of the last jog command
+  last_stamp_ = msg->header.stamp;
+  
   // Publish trajectory message for each controller
   for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
   {
@@ -182,15 +200,18 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
         ROS_INFO_STREAM("Cannot find joint in jog_joint: " << joint_names[i]);
         continue;
       }
-      size_t state_index = std::distance(joint_state.name.begin(),
-                                         std::find(joint_state.name.begin(),
-                                                   joint_state.name.end(), joint_names[i]));
-      if (state_index == joint_state.name.size())
+      size_t state_index = std::distance(joint_state_.name.begin(),
+                                         std::find(joint_state_.name.begin(),
+                                                   joint_state_.name.end(), joint_names[i]));
+      if (state_index == joint_state_.name.size())
       {
-        ROS_ERROR_STREAM("Cannot find joint " << joint_names[i] << " in joint_states");
+        ROS_ERROR_STREAM("Cannot find joint " << joint_names[i] << " in joint_states_");
         continue;
       }
-      point.positions[i] = joint_state.position[state_index] + msg->deltas[jog_index];
+      // Update reference joint position
+      joint_state_.position[state_index] += msg->deltas[jog_index];
+      
+      point.positions[i] = joint_state_.position[state_index];
       point.velocities[i] = 0.0;
       point.accelerations[i] = 0.0;
     }
@@ -215,6 +236,8 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
       traj_pubs_[controller_name].publish(traj);
     }
   }
+  // Publish reference joint state for debug
+  joint_state_pub_.publish(joint_state_);
 }
 
 /**
@@ -229,7 +252,6 @@ void JogJointNode::joint_state_cb(sensor_msgs::JointStateConstPtr msg)
     ROS_WARN("Invalid JointState message");
     return;
   }
-  // Update joint information
   for (int i=0; i<msg->name.size(); i++)
   {
     joint_map_[msg->name[i]] = msg->position[i];
@@ -246,7 +268,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "jog_joint_node");
   jog_joint::JogJointNode node;
 
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(100);
   while ( ros::ok() )
   {
     ros::spinOnce();

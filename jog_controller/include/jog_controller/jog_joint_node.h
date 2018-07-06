@@ -46,11 +46,12 @@ protected:
   std::map<std::string, Controller> cinfo_map_;
   std::map<std::string, TrajClient*> traj_clients_;
   std::map<std::string, ros::Publisher> traj_pubs_;
+  ros::Publisher joint_state_pub_;
 
   std::map<std::string, double> joint_map_;
-  // sensor_msgs::JointState joint_state_;
+  sensor_msgs::JointState joint_state_;
     
-
+  ros::Time last_stamp_;
   double time_from_start_;
   bool use_action_;
 };

@@ -297,9 +297,16 @@ void JogFramePanel::publish()
     msg.angular_delta.z = ori_jog_value_;
   }
 
+  // Publish if the button is enabled
   if(jog_button_->isChecked())
   {
-    jog_frame_pub_.publish(msg);
+    // Publish only if the all command are not equal zero
+    // Not good, we need to compare slider value by some way...
+    if (msg.linear_delta.x != 0 || msg.linear_delta.y != 0 || msg.linear_delta.z != 0 ||
+        msg.angular_delta.x != 0 || msg.angular_delta.y != 0 || msg.angular_delta.z != 0)
+    {
+      jog_frame_pub_.publish(msg);
+    }
   }
 }  
 

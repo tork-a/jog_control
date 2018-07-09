@@ -156,7 +156,7 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
   }
   ROS_INFO_STREAM("msg:" << *msg);
 
-  // Update only if the stamp is older than last_samp_ + time_from_start
+  // Update only if the stamp is older than last_stamp_ + time_from_start
   if (msg->header.stamp > last_stamp_ + ros::Duration(time_from_start_))
   {
     ROS_INFO("ref joint state updated");

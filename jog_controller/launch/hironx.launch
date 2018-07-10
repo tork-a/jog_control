@@ -1,5 +1,5 @@
 <launch>
-  <arg name="use_joy" value="true"/>
+  <arg name="use_joy" value="false"/>
   
   <include file="$(find hironx_moveit_config)/launch/moveit_planning_execution.launch"/>
 

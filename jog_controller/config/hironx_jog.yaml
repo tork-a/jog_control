@@ -1,0 +1,22 @@
+jog_joint_node:
+  joint_names:
+    - LARM_JOINT0
+    - LARM_JOINT1
+    - LARM_JOINT2
+    - LARM_JOINT3
+    - LARM_JOINT4
+    - LARM_JOINT5
+    - RARM_JOINT0
+    - RARM_JOINT1
+    - RARM_JOINT2
+    - RARM_JOINT3
+    - RARM_JOINT4
+    - RARM_JOINT5
+
+jog_frame_node:
+  group_names:
+    - left_arm
+    - right_arm
+  link_names:
+    - LARM_JOINT5_Link
+    - RARM_JOINT5_Link

@@ -33,8 +33,8 @@ class TestJogFrameNode(unittest.TestCase):
         self.frame_id = rospy.get_param('~frame_id', 'base_link')
         self.group_name = rospy.get_param('~group_name', 'manipulator')
         self.link_name = rospy.get_param('~link_name', 'ee_link')
-        self.linear_delta = rospy.get_param('~linear_delta', 0.01)
-        self.angular_delta = rospy.get_param('~angular_delta', 0.03)
+        self.linear_delta = rospy.get_param('~linear_delta', 0.005)
+        self.angular_delta = rospy.get_param('~angular_delta', 0.01)
         # TF listener
         self.listener = tf.TransformListener()
         # Publishers

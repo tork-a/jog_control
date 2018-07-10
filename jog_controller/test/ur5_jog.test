@@ -37,5 +37,18 @@
       delta: 0.01
     </rosparam>
   </test>
+  <test test-name="ur5_frame_jog" pkg="jog_controller" type="test_jog_frame.py">
+    <rosparam>
+      controller_name: arm_controller
+      action_name: follow_joint_trajectory
+      joint_names: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
+      home_positions: [0.0, -1.0, 1.6, 0.0, 0, 0]
+      frame_id: base_link
+      group_name: manipulator
+      link_name: ee_link
+      lienar_delta: 0.005
+      angular_delta: 0.01
+    </rosparam>
+  </test>
   
 </launch>

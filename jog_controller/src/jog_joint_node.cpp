@@ -154,12 +154,10 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
     ROS_ERROR("Size mismatch of joint_names and deltas");
     return;
   }
-  ROS_INFO_STREAM("msg:" << *msg);
-
   // Update only if the stamp is older than last_stamp_ + time_from_start
   if (msg->header.stamp > last_stamp_ + ros::Duration(time_from_start_))
   {
-    ROS_INFO("ref joint state updated");
+    ROS_INFO("start joint state updated");
     // Update reference joint_state
     joint_state_.name.clear();
     joint_state_.position.clear();
@@ -184,10 +182,8 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
     auto controller_name = it->first;
     auto joint_names = it->second.joints;
 
+    trajectory_msgs::JointTrajectory traj;
     trajectory_msgs::JointTrajectoryPoint point;
-    point.positions.resize(joint_names.size());
-    point.velocities.resize(joint_names.size());
-    point.accelerations.resize(joint_names.size());
     point.time_from_start = ros::Duration(time_from_start_);
 
     for (int i=0; i<joint_names.size(); i++)
@@ -208,35 +204,30 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
         ROS_ERROR_STREAM("Cannot find joint " << joint_names[i] << " in joint_states_");
         continue;
       }
-      // Update reference joint position
+      // Update start joint position
       joint_state_.position[state_index] += msg->deltas[jog_index];
-      
-      point.positions[i] = joint_state_.position[state_index];
-      point.velocities[i] = 0.0;
-      point.accelerations[i] = 0.0;
+      // Fill joint trajectory joint_names and positions
+      traj.joint_names.push_back(joint_names[i]);
+      point.positions.push_back(joint_state_.position[state_index]);
+      point.velocities.push_back(0.0);
+      point.accelerations.push_back(0.0);
     }
+    // Fill joint trajectory members
+    traj.header.stamp = ros::Time::now();
+    traj.header.frame_id = "base_link";
+    traj.points.push_back(point);
     if (use_action_)
     {
       control_msgs::FollowJointTrajectoryGoal goal;
-      goal.trajectory.header.stamp = ros::Time::now();
-      goal.trajectory.header.frame_id = "base_link";
-      goal.trajectory.joint_names = joint_names;
-      goal.trajectory.points.push_back(point);
-
+      goal.trajectory = traj;
       traj_clients_[controller_name]->sendGoal(goal);
     }
     else
     {
-      trajectory_msgs::JointTrajectory traj;
-      traj.header.stamp = ros::Time::now();
-      traj.header.frame_id = "base_link";
-      traj.joint_names = joint_names;
-      traj.points.push_back(point);
-      
       traj_pubs_[controller_name].publish(traj);
     }
   }
-  // Publish reference joint state for debug
+  // Publish start joint state for debug
   joint_state_pub_.publish(joint_state_);
 }
 

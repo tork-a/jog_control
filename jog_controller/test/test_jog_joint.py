@@ -35,7 +35,7 @@ class TestJogJointNode(unittest.TestCase):
         self.joint_state_ = rospy.wait_for_message('joint_states', JointState, timeout=10.0)
         rospy.Subscriber('joint_states', JointState, self.cb_joint_states, queue_size=10)
         # Publishers
-        self.pub = rospy.Publisher('jog_joint', JogJoint, queue_size=10)
+        self.pub = rospy.Publisher('jog_joint', JogJoint, queue_size=50)
         # Actionlib
         self.client = actionlib.SimpleActionClient(
             self.controller_name + '/' + self.action_name, FollowJointTrajectoryAction)
@@ -59,7 +59,7 @@ class TestJogJointNode(unittest.TestCase):
         
     def cb_joint_states(self, msg):
         self.joint_state_ = msg
-        
+    
     def test_one_jog_for_all_joint(self):
         '''Test to jog a jog command'''
         joint_state = self.joint_state_
@@ -68,7 +68,7 @@ class TestJogJointNode(unittest.TestCase):
         jog.joint_names = self.joint_names
         jog.deltas = [self.delta]*len(jog.joint_names)
         self.pub.publish(jog)
-        rospy.sleep(0.5)
+        rospy.sleep(1.0)
         # Check if the robot is jogged by delta
         for joint in self.joint_names:
             index = joint_state.name.index(joint)
@@ -84,7 +84,7 @@ class TestJogJointNode(unittest.TestCase):
             jog.joint_names = self.joint_names
             jog.deltas = [self.delta]*len(jog.joint_names)
             self.pub.publish(jog)
-        rospy.sleep(0.5)
+        rospy.sleep(1.0)
         # Check if the robot is jogged by 10*delta
         for joint in self.joint_names:
             index = joint_state.name.index(joint)
@@ -106,12 +106,14 @@ class TestJogJointNode(unittest.TestCase):
             jog.joint_names = self.joint_names
             jog.deltas = [-self.delta]*len(jog.joint_names)
             self.pub.publish(jog)
-        rospy.sleep(0.5)
+        rospy.sleep(1.0)
         # Check if the robot is not moved
         for joint in self.joint_names:
             index = joint_state.name.index(joint)
-            self.assertAlmostEqual(joint_state.position[index],
-                                   self.joint_state_.position[index], delta=0.0001)
+            self.assertAlmostEqual(
+                joint_state.position[index],
+                self.joint_state_.position[index],
+                delta=0.0001)
 
     def test_empty_jog_for_all_joint(self):
         '''Test to publish empty jonit_names/positions jog command'''
@@ -119,12 +121,14 @@ class TestJogJointNode(unittest.TestCase):
         jog = JogJoint()
         jog.header.stamp = rospy.Time.now()
         self.pub.publish(jog)
-        rospy.sleep(0.5)
+        rospy.sleep(1.0)
         # Check if the robot is not moved
         for joint in self.joint_names:
             index = joint_state.name.index(joint)
             self.assertAlmostEqual(
-                joint_state.position[index], self.joint_state_.position[index], delta=0.0001)
+                joint_state.position[index],
+                self.joint_state_.position[index],
+                delta=0.0001)
             
 if __name__ == '__main__':
     rostest.rosrun('jog_joint', 'test_jog_joint_node', TestJogJointNode)

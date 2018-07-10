@@ -4,7 +4,7 @@
        
   <!-- Launch UR5 gazebo -->
   <include file="$(find ur_gazebo)/launch/ur5_joint_limited.launch">
-    <arg name="gui" value="$(arg use_gui)"/>
+    <arg name="gui" value="false"/>
   </include>
 
   <!-- Launch MoveIt! -->
@@ -19,13 +19,23 @@
   <!-- Launch jog_controllers -->
   <include file="$(find jog_controller)/launch/ur5.launch">
     <arg name="use_joy" value="false"/>
-  </include>	   
+  </include>
 
   <!-- Run tests -->
   <param name="ur5_hztest/topic" value="joint_states"/>
   <param name="ur5_hztest/hz" value="50.0"/>
   <param name="ur5_hztest/hzerror" value="0.5"/>
   <param name="ur5_hztest/test_duration" value="5.0"/>  
-  <test test-name="ur5_hztest" pkg="rostest" type="hztest" name="ur5_hztest"/>
+  <test test-name="ur5_hztest" pkg="rostest" type="hztest"/>
 
+  <test test-name="ur5_joint_jog" pkg="jog_controller" type="test_jog_joint.py">
+    <rosparam>
+      controller_name: arm_controller
+      action_name: follow_joint_trajectory
+      joint_names: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
+      home_positions: [0.0, -1.0, 1.6, 0.0, 0, 0]
+      delta: 0.01
+    </rosparam>
+  </test>
+  
 </launch>

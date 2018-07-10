@@ -103,8 +103,8 @@ JogFrameNode::JogFrameNode()
   }  
 
   // Create subscribers
-  joint_state_sub_ = gnh.subscribe("joint_states", 1, &JogFrameNode::joint_state_cb, this);
-  jog_frame_sub_ = gnh.subscribe("jog_frame", 1, &JogFrameNode::jog_frame_cb, this);
+  joint_state_sub_ = gnh.subscribe("joint_states", 10, &JogFrameNode::joint_state_cb, this);
+  jog_frame_sub_ = gnh.subscribe("jog_frame", 10, &JogFrameNode::jog_frame_cb, this);
   fk_client_ = gnh.serviceClient<moveit_msgs::GetPositionFK>("compute_fk");  
   ik_client_ = gnh.serviceClient<moveit_msgs::GetPositionIK>("compute_ik");  
   ros::topic::waitForMessage<sensor_msgs::JointState>("joint_states");
@@ -154,61 +154,71 @@ JogFrameNode::JogFrameNode()
 */
 void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 {
-  // Update current joint state
-  sensor_msgs::JointState joint_state;
-  for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
+  joint_state_.header.stamp = ros::Time::now();
+  // Update reference frame only if the stamp is older than last_stamp_ + time_from_start_
+  if (msg->header.stamp > last_stamp_ + ros::Duration(time_from_start_))
   {
-    // Exclude joint in exclude_joints_
-    if (std::find(exclude_joints_.begin(),
-                  exclude_joints_.end(), it->first) != exclude_joints_.end())
+    joint_state_.name.clear();
+    joint_state_.position.clear();
+    joint_state_.velocity.clear();
+    joint_state_.effort.clear();
+    for (auto it=joint_map_.begin(); it!=joint_map_.end(); it++)
     {
-      ROS_INFO_STREAM("joint " << it->first << "is excluded from FK");
-      continue;
+      // Exclude joint in exclude_joints_
+      if (std::find(exclude_joints_.begin(),
+                    exclude_joints_.end(), it->first) != exclude_joints_.end())
+      {
+        ROS_INFO_STREAM("joint " << it->first << "is excluded from FK");
+        continue;
+      }
+      // Update reference joint_state
+      joint_state_.name.push_back(it->first);
+      joint_state_.position.push_back(it->second);
+      joint_state_.velocity.push_back(0.0);
+      joint_state_.effort.push_back(0.0);
     }
-    joint_state.name.push_back(it->first);
-    joint_state.position.push_back(it->second);
-    joint_state.velocity.push_back(0.0);
-    joint_state.effort.push_back(0.0);
-  }
-  // Update forward kinematics
-  moveit_msgs::GetPositionFK fk;
+    // Update forward kinematics
+    moveit_msgs::GetPositionFK fk;
 
-  fk.request.header.frame_id = msg->header.frame_id;
-  fk.request.header.stamp = ros::Time::now();
-  fk.request.fk_link_names.clear();
-  fk.request.fk_link_names.push_back(msg->link_name);
-  fk.request.robot_state.joint_state = joint_state;
+    fk.request.header.frame_id = msg->header.frame_id;
+    fk.request.header.stamp = ros::Time::now();
+    fk.request.fk_link_names.clear();
+    fk.request.fk_link_names.push_back(msg->link_name);
+    fk.request.robot_state.joint_state = joint_state_;
 
-  if (fk_client_.call(fk))
-  {
-    if(fk.response.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS)
+    if (fk_client_.call(fk))
     {
-      ROS_WARN("****FK error %d", fk.response.error_code.val);
+      if(fk.response.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS)
+      {
+        ROS_INFO_STREAM("fk: " << fk.request);
+        ROS_WARN("****FK error %d", fk.response.error_code.val);
+        return;
+      }
+      if (fk.response.pose_stamped.size() != 1)
+      {
+        for (int i=0; i<fk.response.pose_stamped.size(); i++)
+        {
+          ROS_ERROR_STREAM("fk[" << i << "]:\n" << fk.response.pose_stamped[0]);
+        }
+      }
+      pose_stamped_ = fk.response.pose_stamped[0];
+    }
+    else
+    {
+      ROS_ERROR("Failed to call service /computte_fk");
       return;
     }
-    if (fk.response.pose_stamped.size() != 1)
-    {
-      for (int i=0; i<fk.response.pose_stamped.size(); i++)
-      {
-        ROS_ERROR_STREAM("fk[" << i << "]:\n" << fk.response.pose_stamped[0]);
-      }
-    }
-    pose_stamped_ = fk.response.pose_stamped[0];
   }
-  else
-  {
-    ROS_ERROR("Failed to call service /computte_fk");
-    return;
-  }
+  // Update timestamp of the last jog command
+  last_stamp_ = msg->header.stamp;
 
   // Solve inverse kinematics
   moveit_msgs::GetPositionIK ik;
 
   ik.request.ik_request.group_name = msg->group_name;
   ik.request.ik_request.ik_link_name = msg->link_name;
-  ik.request.ik_request.robot_state.joint_state = joint_state;
-  //ik.request.ik_request.avoid_collisions = msg->avoid_collisions;
-  ik.request.ik_request.avoid_collisions = true;
+  ik.request.ik_request.robot_state.joint_state = joint_state_;
+  ik.request.ik_request.avoid_collisions = msg->avoid_collisions;
   
   geometry_msgs::Pose act_pose = pose_stamped_.pose;
   geometry_msgs::PoseStamped ref_pose;
@@ -265,11 +275,11 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   double error = 0;
   for (int i=0; i<state.name.size(); i++)
   {
-    for (int j=0; j<joint_state.name.size(); j++)
+    for (int j=0; j<joint_state_.name.size(); j++)
     {
-      if (state.name[i] == joint_state.name[j])
+      if (state.name[i] == joint_state_.name[j])
       {
-        double e = fabs(state.position[i] - joint_state.position[j]);
+        double e = fabs(state.position[i] - joint_state_.position[j]);
         if (e > error)
         {
           error = e;
@@ -278,7 +288,7 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
       }
     }
   }
-  if (error > 0.5)
+  if (error > M_PI / 2)
   {
     ROS_WARN_STREAM("**** Validation check Failed: " << error);
     return;
@@ -336,6 +346,9 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
       traj_pubs_[controller_name].publish(traj);
     }
   }
+  // update pose_stamped_
+  pose_stamped_.pose = ref_pose.pose;
+  
 }
 
 /**

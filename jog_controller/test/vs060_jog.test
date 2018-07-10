@@ -1,0 +1,26 @@
+<!-- Launch file to test VS060 loopback controller -->
+<launch>
+  <arg name="use_rviz" default="false"/>
+       
+  <!-- Launch loopback controller and MoveIt! -->
+  <include file="$(find denso_launch)/launch/denso_vs060_moveit_demo_simulation.launch">
+    <arg name="use_rviz" value="$(arg use_rviz)"/>
+  </include>
+
+  <!-- Launch jog_controllers -->
+  <include file="$(find jog_controller)/launch/vs060.launch">
+    <arg name="use_joy" value="false"/>
+  </include>	   
+
+  <!-- Run tests -->
+  <param name="vs060_hztest/topic" value="arm_controller/joint_states"/>
+  <param name="vs060_hztest/hz" value="100.0"/>
+  <param name="vs060_hztest/hzerror" value="0.5"/>
+  <param name="vs060_hztest/test_duration" value="5.0"/>  
+  <test test-name="vs060_hztest" pkg="rostest" type="hztest" name="vs060_hztest"/>
+
+  <test if="false" test-name="vs060_jog" name="vs060_jog_test" pkg="jog_controller" type="test_jog_joint.py">
+    <remap from="arm_controller/joint_states" to="joint_states"/>
+    <param name="joint_list" value="[j1, j2, j3, j4, j5, flange]"/>
+  </test>
+</launch>

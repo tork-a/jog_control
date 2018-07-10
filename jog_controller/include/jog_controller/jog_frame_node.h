@@ -60,6 +60,8 @@ protected:
   std::string target_link_;
   std::string group_name_;
   std::vector<std::string> exclude_joints_;
+  sensor_msgs::JointState joint_state_;
+  ros::Time last_stamp_;
 };
 
 } // namespace jog_frame

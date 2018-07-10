@@ -129,9 +129,23 @@ void JogJointPanel::publish()
   {
     msg.deltas[i] = 0.1 * jog_slider_[i]->value() / jog_slider_[i]->maximum();
   }
+  // Publish if the button is enabled
   if(jog_button_->isChecked())
   {
-    jog_joint_pub_.publish(msg);
+    // Publish only if the all value are not equal zero
+    bool flag = false;
+    for (int i=0; i<jog_slider_.size(); i++)
+    {
+      if (jog_slider_[i]->value() != 0)
+      {
+        flag = true;
+        break;
+      }
+    }
+    if (flag)
+    {
+      jog_joint_pub_.publish(msg);
+    }
   }
 }  
 

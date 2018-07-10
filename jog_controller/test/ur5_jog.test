@@ -1,0 +1,31 @@
+<!-- Launch file to test the jog_controller with UR5 gazebo -->
+<launch>
+  <arg name="use_gui" default="false"/>
+       
+  <!-- Launch UR5 gazebo -->
+  <include file="$(find ur_gazebo)/launch/ur5_joint_limited.launch">
+    <arg name="gui" value="$(arg use_gui)"/>
+  </include>
+
+  <!-- Launch MoveIt! -->
+  <include file="$(find ur5_moveit_config)/launch/ur5_moveit_planning_execution.launch">
+    <arg name="sim" value="true"/>
+  </include>
+  <include if="$(arg use_gui)"
+	   file="$(find ur5_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+  </include>
+
+  <!-- Launch jog_controllers -->
+  <include file="$(find jog_controller)/launch/ur5.launch">
+    <arg name="use_joy" value="false"/>
+  </include>	   
+
+  <!-- Run tests -->
+  <param name="ur5_hztest/topic" value="joint_states"/>
+  <param name="ur5_hztest/hz" value="50.0"/>
+  <param name="ur5_hztest/hzerror" value="0.5"/>
+  <param name="ur5_hztest/test_duration" value="5.0"/>  
+  <test test-name="ur5_hztest" pkg="rostest" type="hztest" name="ur5_hztest"/>
+
+</launch>

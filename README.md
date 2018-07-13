@@ -27,6 +27,27 @@ and MoveIt!. Some robots are from
 [ROS-Industrial repositry](https://github.com/ros-industrial), which
 you need to build from source code.
 
+# How to install
+
+## Install from binary
+
+```
+$ apt-get install ros-kinetic-jog-control
+```
+
+## Install from source
+
+```
+$ mkdir -p ws/src
+$ cd ws
+$ wstool init src
+$ wstool set -t src jog_control --git http://github.com/tork-a/jog_control
+$ wstool update
+$ rosdep install -r --rosdistro kinetic --track kinetic
+$ catkin build
+$ source devel/setup.bash
+```
+
 ## UR5 
 
 ![UR5 jog control](image/ur5_jog.png)

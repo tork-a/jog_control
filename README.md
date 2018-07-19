@@ -29,10 +29,12 @@ you need to build from source code.
 
 # How to install
 
-## Install from binary
+## Install from binary (in the future)
+
+This package is not released yet. When it is released, you can install by apt command.
 
 ```
-$ apt-get install ros-kinetic-jog-control
+$ apt install ros-kinetic-jog-control
 ```
 
 ## Install from source

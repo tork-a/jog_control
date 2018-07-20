@@ -45,7 +45,7 @@ $ cd ws
 $ wstool init src
 $ wstool set -t src jog_control --git http://github.com/tork-a/jog_control
 $ wstool update
-$ rosdep install -r --rosdistro kinetic --track kinetic
+$ rosdep install -r --rosdistro kinetic --from-paths src --ignore-src
 $ catkin build
 $ source devel/setup.bash
 ```

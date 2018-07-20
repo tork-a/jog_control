@@ -20,13 +20,6 @@ This `jog_control` repositry has packages for jog control
 (reasonably). You can jog your robot by rviz jog panel, joypads,
 keyboards, and teaching pendants using these packages.
 
-# Quick start
-
-You can see the idea of jog_control package by demo with simulation
-and MoveIt!. Some robots are from
-[ROS-Industrial repositry](https://github.com/ros-industrial), which
-you need to build from source code.
-
 # How to install
 
 ## Install from binary (in the future)
@@ -50,6 +43,13 @@ $ rosdep install -r --from-path src
 $ catkin build
 $ source devel/setup.bash
 ```
+
+# Quick start
+
+You can see the idea of jog_control package by demo with simulation
+and MoveIt!. Some robots are from
+[ROS-Industrial repositry](https://github.com/ros-industrial), which
+you need to build from source code.
 
 ## UR5 
 
@@ -196,9 +196,14 @@ TBA.
 
 `jog_controller` contains ROS nodes for jog control.
 
+# CAUTION
+
+- Please take extra care when you use this package with real robot, seriously!
+- You need to launch MoveIt! before start jog_controllers
+  - https://github.com/tork-a/jog_control/issues/18
+
 # TODO
 
-- For precise jog and stability, joint position should updated only when the jog start
 - Wiser target picking (group name, target link, etc)
 - Marker visualization for target link and base link
-
+- Dynamic reconfigure for jog_controller

@@ -40,12 +40,13 @@ $ apt install ros-kinetic-jog-control
 ## Install from source
 
 ```
+$ source /opt/ros/kinetic/setup.bash
 $ mkdir -p ws/src
 $ cd ws
 $ wstool init src
 $ wstool set -t src jog_control --git http://github.com/tork-a/jog_control
-$ wstool update
-$ rosdep install -r --rosdistro kinetic --track kinetic
+$ wstool update -t src
+$ rosdep install -r --from-path src
 $ catkin build
 $ source devel/setup.bash
 ```

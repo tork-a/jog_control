@@ -39,7 +39,7 @@ $ cd ws
 $ wstool init src
 $ wstool set -t src jog_control --git http://github.com/tork-a/jog_control
 $ wstool update -t src
-$ rosdep install -r --from-path src
+$ rosdep install -r --from-path src --ignore-src
 $ catkin build
 $ source devel/setup.bash
 ```

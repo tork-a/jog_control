@@ -178,8 +178,8 @@ You ca add new panel JogFramePanel in rviz.
 
 ## Joypad control
 
-You can also use a joypad.
-TBA.
+You can also use a joypad. Please consult
+[jog_controller/README.md](jog_controller/README.md)
 
 ## Teaching pendant
 

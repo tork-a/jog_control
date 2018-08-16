@@ -3,7 +3,7 @@
 
   <!-- Jog controllers -->
   <rosparam command="load"
-	    file="$(find jog_controller)/config/vs060_jog.yaml"/>
+	    file="$(find jog_launch)/config/vs060_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
     <remap from="joint_states" to="arm_controller/joint_states"/>
   </node>

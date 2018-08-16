@@ -20,11 +20,19 @@ This `jog_control` repositry has packages for jog control
 (reasonably). You can jog your robot by rviz jog panel, joypads,
 keyboards, and teaching pendants using these packages.
 
+# Quick start
+
+You can see the idea of jog_control package by demo in `jog_launch`
+package. It uses simulation and MoveIt!. Some robots are from
+[ROS-Industrial repositry](https://github.com/ros-industrial), which
+you need to build from source code.
+
 # How to install
 
 ## Install from binary (in the future)
 
-This package is not released yet. When it is released, you can install by apt command.
+This package is not released yet. When it is released, you can install
+by apt command.
 
 ```
 $ apt install ros-kinetic-jog-control
@@ -44,18 +52,11 @@ $ catkin build
 $ source devel/setup.bash
 ```
 
-# Quick start
-
-You can see the idea of jog_control package by demo with simulation
-and MoveIt!. Some robots are from
-[ROS-Industrial repositry](https://github.com/ros-industrial), which
-you need to build from source code.
-
-## UR5 
+## UR3 and UR5(Gazebo and MoveIt!)
 
 ![UR5 jog control](image/ur5_jog.png)
 
-Launch simulation and MoveIt!
+Launch simulation and MoveIt! (Replace ur5 to ur3 if you need)
 
 ```
 $ roslaunch ur_gazebo ur5_joint_limited.launch
@@ -66,10 +67,19 @@ $ roslaunch ur5_moveit_config moveit_rviz.launch config:=true
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller ur5.launch
+$ roslaunch jog_launch ur5.launch
 ```
 
-## TRA1
+## UR5(fake_joint)
+
+You can use `fake_joint` package to use the perfect joint
+controller. Just launch:
+
+```
+$ roslaunch jog_launch ur5.launch use_fake_joint:=true use_moveit:=true use_rviz:=true
+```
+
+## TRA1 (Simulation mode)
 
 ![TRA1 jog control](image/tra1_jog.png)
 
@@ -85,6 +95,16 @@ And launch jog nodes.
 ```
 $ roslaunch jog_controller tra1.launch
 ```
+
+## TRA1 (fake_joint)
+
+You can use `fake_joint` package to use the perfect joint
+controller. Just launch:
+
+```
+$ roslaunch jog_launch tra1.launch use_fake_joint:=true use_moveit:=true use_rviz:=true
+```
+
 
 ## Denso VS060
 

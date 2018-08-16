@@ -3,7 +3,7 @@
   
   <!-- Launch jog controllers -->
   <rosparam command="load"
-	    file="$(find jog_controller)/config/abb_irb2400_jog.yaml"/>
+	    file="$(find jog_launch)/config/abb_irb2400_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
     <param name="use_action" value="true"/>
     <param name="time_from_start" value="1.0"/>

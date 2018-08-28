@@ -23,6 +23,7 @@
   <depend>rviz</depend>
   <exec_depend>nextage_ros_bridge</exec_depend>
   <exec_depend>nextage_moveit_config</exec_depend>
+  <test_depend>ur_gazebo</test_depend>
 
   <export>
     <rviz plugin="${prefix}/plugin_description.xml"/>

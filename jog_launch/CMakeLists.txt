@@ -17,7 +17,10 @@ install(DIRECTORY launch config
 )
 
 if(CATKIN_ENABLE_TESTING)
-  file(GLOB LAUNCH_FILES launch/*.launch)
+  set(LAUNCH_FILES
+    launch/ur3.launch
+    launch/ur5.launch
+  )
   foreach(LAUNCH_FILE ${LAUNCH_FILES})
     message(STATUS "Testing ${LAUNCH_FILE}")
     roslaunch_add_file_check(${LAUNCH_FILE})

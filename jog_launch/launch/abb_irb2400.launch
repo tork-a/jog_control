@@ -1,5 +1,24 @@
 <launch>
+  <arg name="use_fake_joint" default="false"/>
+  <arg name="use_moveit" default="false"/>
+  <arg name="use_rviz" default="false"/>
   <arg name="use_joy" default="false"/>
+  
+  <!-- Launch fake_joint_driver -->
+  <include if="$(arg use_fake_joint)"
+	   file="$(find fake_joint_launch)/launch/abb_irb2400.launch">
+    <arg name="use_rviz" value="false"/>
+    <arg name="use_rqt" value="false"/>
+    <arg name="use_robot_state_publisher" value="false"/>
+  </include>
+
+  <!-- Launch MoveIt! -->
+  <include if="$(arg use_moveit)"
+	   file="$(find abb_irb2400_moveit_config)/launch/moveit_planning_execution.launch">
+    <arg name="sim" value="false"/>
+    <arg name="robot_ip" value="127.0.0.1"/>
+  </include>
+  
   
   <!-- Launch jog controllers -->
   <rosparam command="load"

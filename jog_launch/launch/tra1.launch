@@ -1,9 +1,22 @@
 <launch>
+  <arg name="use_fake_joint" default="false"/>
+  <arg name="use_moveit" default="false"/>
+  <arg name="use_rviz" default="false"/>
   <arg name="use_joy" default="false"/>
+
+  <!-- Launch fake_joint_launch -->
+  <include if="$(arg use_fake_joint)"
+	   file="$(find fake_joint_launch)/launch/tra1.launch">
+    <arg name="use_rviz" value="false"/>
+  </include>
+
+  <!-- Launch MoveIt! -->
+  <include if="$(arg use_moveit)"
+	   file="$(find tra1_bringup)/launch/tra1_moveit.launch"/>
 
   <!-- Jog controllers -->
   <rosparam command="load"
-	    file="$(find jog_controller)/config/tra1_jog.yaml"/>
+	    file="$(find jog_launch)/config/tra1_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
 

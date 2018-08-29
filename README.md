@@ -93,7 +93,7 @@ $ roslaunch tra1_bringup tra1_moveit.launch
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller tra1.launch
+$ roslaunch jog_launch tra1.launch
 ```
 
 ## TRA1 (fake_joint)
@@ -119,10 +119,10 @@ $ roslaunch denso_launch denso_vs060_moveit_demo_simulation.launch
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller vs060.launch
+$ roslaunch jog_launch vs060.launch
 ```
 
-## NEXTAGE Open
+## NEXTAGE Open (OpenRTM simulation)
 
 ![NEXTAGE Open jog control](image/nextage_jog.png)
 
@@ -136,7 +136,16 @@ $ roslaunch nextage_moveit_config moveit_planning_execution.launch
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller nextage.launch
+$ roslaunch jog_launch nextage.launch
+```
+
+## NEXTAGE Open (fake_joint)
+
+You can use `fake_joint` package to use the perfect joint
+controller. Just launch:
+
+```
+$ roslaunch jog_launch nextage.launch use_fake_joint:=true use_moveit:=true
 ```
 
 ## ABB IRB2400
@@ -155,7 +164,7 @@ $ roslaunch abb_irb2400_moveit_config moveit_planning_execution.launch
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller abb_irb2400.launch 
+$ roslaunch jog_launch abb_irb2400.launch 
 ```
 
 ## MOTOMAN SIA20D
@@ -171,7 +180,7 @@ $ roslaunch motoman_sia20d_moveit_config moveit_planning_execution.launch sim:=t
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller motoman_sia20d.launch
+$ roslaunch jog_launch motoman_sia20d.launch
 ```
 
 ## MOTOMAN SDA10F
@@ -189,7 +198,7 @@ $ roslaunch motoman_sda10f_moveit_config moveit_planning_execution.launch sim:=t
 And launch jog nodes.
 
 ```
-$ roslaunch jog_controller motoman_sda10f.launch 
+$ roslaunch jog_launch motoman_sda10f.launch 
 ```
 
 ## rviz JogFramePanel Pugin

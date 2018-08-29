@@ -1,6 +1,7 @@
 <launch>
-  <arg name="use_fake_joint" default="true"/>
-  <arg name="use_moveit" default="true"/>
+  <arg name="use_fake_joint" default="false"/>
+  <arg name="use_moveit" default="false"/>
+  <arg name="use_rviz" default="false"/>
   <arg name="use_joy" default="false"/>
 
   <!-- Launch fake_joint_launch -->

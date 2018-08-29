@@ -4,6 +4,16 @@
   <arg name="use_rviz" default="false"/>
   <arg name="use_joy" default="false"/>
   
+  <!-- Launch fake_joint_launch -->
+  <include if="$(arg use_fake_joint)"
+	   file="$(find fake_joint_launch)/launch/nextage.launch">
+    <arg name="use_rviz" value="false"/>
+  </include>
+
+  <!-- Launch MoveIt! -->
+  <include if="$(arg use_moveit)"
+	   file="$(find nextage_moveit_config)/launch/moveit_planning_execution.launch"/>
+
   <!-- Launch jog_controllers -->
   <rosparam command="load" file="$(find jog_launch)/config/nextage_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>

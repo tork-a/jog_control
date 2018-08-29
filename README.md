@@ -1,4 +1,4 @@
-# Overview
+# Overview [![Build Status](https://travis-ci.org/tork-a/jog_control.svg?branch=master)](https://travis-ci.org/tork-a/jog_control)
 
 [ROS](http://www.ros.org) and [MoveIt!](http://moveit.ros.org) are
 very powerful tools for industrial manipulators. Many people use ROS

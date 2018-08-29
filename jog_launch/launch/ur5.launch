@@ -21,13 +21,15 @@
   
   <rosparam command="load" file="$(find jog_launch)/config/ur_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
-  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node"/>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="use_action" value="true"/>
+  </node>
 
   <!-- Launch joypad -->
   <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
     <arg name="group_name" value="manipulator"/>
     <arg name="frame_id" value="base_link"/>
-    <arg name="link_name" value="link_ee"/>
+    <arg name="link_name" value="ee_link"/>
   </include>
 
 </launch>

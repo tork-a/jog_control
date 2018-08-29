@@ -27,7 +27,7 @@
   <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
     <arg name="group_name" value="manipulator"/>
     <arg name="frame_id" value="base_link"/>
-    <arg name="link_name" value="link_ee"/>
+    <arg name="link_name" value="ee_link"/>
   </include>
 
 </launch>

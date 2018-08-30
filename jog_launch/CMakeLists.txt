@@ -28,5 +28,6 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest(test/ur3_jog.test)
   add_rostest(test/ur5_jog.test)
+  add_rostest(test/tra1_jog.test)
   
 endif()

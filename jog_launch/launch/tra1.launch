@@ -10,9 +10,21 @@
     <arg name="use_rviz" value="false"/>
   </include>
 
-  <!-- Launch MoveIt! -->
-  <include if="$(arg use_moveit)"
-	   file="$(find tra1_bringup)/launch/tra1_moveit.launch"/>
+  <!-- Launch MoveIt! (tra1 doen't have planning_execution.launch (it should have) -->
+  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+  <include file="$(find tra1_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="false"/>
+  </include>
+
+  <!-- Run the main MoveIt executable without trajectory execution -->
+  <include file="$(find tra1_moveit_config)/launch/move_group.launch">
+    <arg name="allow_trajectory_execution" value="true"/>
+    <arg name="fake_execution" value="false"/>
+    <arg name="info" value="true"/>
+  </include>
+
+  <!-- Launch rviz -->
+  <node if="$(arg use_rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find jog_launch)/launch/jog.rviz"/>
 
   <!-- Jog controllers -->
   <rosparam command="load"

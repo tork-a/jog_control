@@ -1,23 +1,10 @@
-<!-- Launch file to test the jog_controller with UR5 gazebo -->
+<!-- Launch file to test the jog_controller with UR5 fake_joint -->
 <launch>
-  <arg name="use_gui" default="false"/>
-       
-  <!-- Launch UR5 gazebo -->
-  <include file="$(find ur_gazebo)/launch/ur5_joint_limited.launch">
-    <arg name="gui" value="false"/>
-  </include>
-
-  <!-- Launch MoveIt! -->
-  <include file="$(find ur5_moveit_config)/launch/ur5_moveit_planning_execution.launch">
-    <arg name="sim" value="true"/>
-  </include>
-  <include if="$(arg use_gui)"
-	   file="$(find ur5_moveit_config)/launch/moveit_rviz.launch">
-    <arg name="config" value="true"/>
-  </include>
-
-  <!-- Launch jog_controllers -->
-  <include file="$(find jog_controller)/launch/ur5.launch">
+  <!-- Launch UR5 with fake_joint -->
+  <include file="$(find jog_launch)/launch/ur5.launch">
+    <arg name="use_fake_joint" value="true"/>
+    <arg name="use_moveit" value="true"/>
+    <arg name="use_rviz" value="false"/>
     <arg name="use_joy" value="false"/>
   </include>
 
@@ -46,7 +33,7 @@
       frame_id: base_link
       group_name: manipulator
       link_name: ee_link
-      lienar_delta: 0.005
+      linear_delta: 0.005
       angular_delta: 0.01
     </rosparam>
   </test>

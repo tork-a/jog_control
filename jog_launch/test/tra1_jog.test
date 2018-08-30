@@ -1,7 +1,5 @@
 <!-- Launch file to test TRA1 loopback controller -->
 <launch>
-  <arg name="use_rviz" default="true"/>
-       
   <!-- Launch loopback controller -->
   <include file="$(find tra1_bringup)/launch/tra1_bringup.launch">
     <arg name="simulation" value="true"/>

@@ -4,7 +4,7 @@
   <include file="$(find jog_launch)/launch/ur3.launch">
     <arg name="use_fake_joint" value="true"/>
     <arg name="use_moveit" value="true"/>
-    <arg name="use_rviz" value="true"/>
+    <arg name="use_rviz" value="false"/>
     <arg name="use_joy" value="false"/>
   </include>
 

@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_visual_tools
   moveit_msgs
   roscpp
+  roslaunch
   rviz
 )
 
@@ -88,6 +89,9 @@ install(TARGETS jog_frame_node jog_joint_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(PROGRAMS script/joy_to_jog_frame.py script/joy_to_jog_joint.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 install(FILES plugin_description.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
@@ -102,12 +106,11 @@ install(DIRECTORY launch config
 # Tests
 if(CATKIN_ENABLE_TESTING)
 
-  find_package(roslint REQUIRED)
-  set(ROSLINT_CPP_OPTS "--filter=-runtime/references,-runtime/int")
-  set(ROSLINT_PYTHON_OPTS "--max-line-length=180")
+  #find_package(roslint REQUIRED)
+  #set(ROSLINT_CPP_OPTS "--filter=-runtime/references,-runtime/int")
+  #set(ROSLINT_PYTHON_OPTS "--max-line-length=180")
   # add_dependencies(tests roslint)
 
-  find_package(roslaunch REQUIRED)
   file(GLOB LAUNCH_FILES launch/*.launch)
   foreach(LAUNCH_FILE ${LAUNCH_FILES})
     message(STATUS "Testing ${LAUNCH_FILE}")

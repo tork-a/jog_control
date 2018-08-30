@@ -20,10 +20,9 @@
   <depend>moveit_visual_tools</depend>
   <depend>moveit_msgs</depend>
   <depend>roscpp</depend>
+  <build_depend>roslaunch</build_depend>
   <depend>rviz</depend>
-  <exec_depend>nextage_ros_bridge</exec_depend>
-  <exec_depend>nextage_moveit_config</exec_depend>
-  <test_depend>ur_gazebo</test_depend>
+  <exec_depend>joy</exec_depend>
 
   <export>
     <rviz plugin="${prefix}/plugin_description.xml"/>

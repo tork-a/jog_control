@@ -26,7 +26,7 @@ if(CATKIN_ENABLE_TESTING)
     roslaunch_add_file_check(${LAUNCH_FILE})
   endforeach()
 
-  # add_rostest(test/ur3_jog.test)
+  add_rostest(test/ur3_jog.test)
   add_rostest(test/ur5_jog.test)
   
 endif()

@@ -1,0 +1,46 @@
+<!-- Launch file to test Nextage with fake_joint -->
+<launch>
+  <arg name="use_rviz" default="false"/>
+  
+  <!-- Launch Nextage jog system with fake_joint -->
+  <include file="$(find jog_launch)/launch/nextage.launch">
+    <arg name="use_fake_joint" value="true"/>
+    <arg name="use_moveit" value="true"/>
+    <arg name="use_rviz" value="$(arg use_rviz)"/>
+    <arg name="use_joy" value="false"/>
+  </include>
+
+  <!-- Run tests -->
+  <param name="nextage_hztest/topic" value="joint_states"/>
+  <param name="nextage_hztest/hz" value="190.0"/>
+  <param name="nextage_hztest/hzerror" value="50"/>
+  <param name="nextage_hztest/test_duration" value="5.0"/>  
+  <test if="false" test-name="nextage_hztest" pkg="rostest" type="hztest" name="nextage_hztest"/>
+
+  <test if="false" test-name="nextage_joint_jog" pkg="jog_controller" type="test_jog_joint.py">
+    <rosparam>
+      joint_names: [LARM_JOINT0, LARM_JOINT1, LARM_JOINT2, LARM_JOINT3, LARM_JOINT4, LARM_JOINT5]
+      delta: 0.02
+    </rosparam>
+  </test>
+
+  <test test-name="nextage_larm_frame_jog" pkg="jog_controller" type="test_jog_frame.py">
+    <rosparam>
+      frame_id: WAIST
+      group_name: left_arm
+      link_name: LARM_JOINT5_Link
+      linear_delta: 0.005
+      angular_delta: 0.01
+    </rosparam>
+  </test>
+
+  <test test-name="nextage_rarm_frame_jog" pkg="jog_controller" type="test_jog_frame.py">
+    <rosparam>
+      frame_id: WAIST
+      group_name: right_arm
+      link_name: RARM_JOINT5_Link
+      linear_delta: 0.005
+      angular_delta: 0.01
+    </rosparam>
+  </test>
+</launch>

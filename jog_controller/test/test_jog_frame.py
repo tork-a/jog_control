@@ -11,7 +11,6 @@ import sys
 from trajectory_msgs.msg import (
     JointTrajectoryPoint,
 )
-import sys
 from jog_msgs.msg import JogFrame
 import rospy
 import rostest
@@ -26,8 +25,8 @@ class TestJogFrameNode(unittest.TestCase):
 
     def setUp(self):
         # Get parameters
-        self.controller_name = rospy.get_param('~controller_name', 'arm_controller')
-        self.action_name = rospy.get_param('~action_name', 'follow_joint_trajectory')
+        self.controller_name = rospy.get_param('~controller_name', None)
+        self.action_name = rospy.get_param('~action_name', None)
         self.joint_names = rospy.get_param('~joint_names', [])
         self.home_positions = rospy.get_param('~home_positions', [])
         self.frame_id = rospy.get_param('~frame_id', 'base_link')
@@ -40,11 +39,14 @@ class TestJogFrameNode(unittest.TestCase):
         # Publishers
         self.pub = rospy.Publisher('jog_frame', JogFrame, queue_size=10)
         # Actionlib
-        self.client = actionlib.SimpleActionClient(
-            self.controller_name + '/' + self.action_name, FollowJointTrajectoryAction)
-        self.client.wait_for_server()
-        # Move to home position
-        self.move_to_home()
+        self.client = None
+        if self.controller_name and self.action_name:
+            self.client = actionlib.SimpleActionClient(
+                self.controller_name + '/' + self.action_name, FollowJointTrajectoryAction)
+            self.client.wait_for_server()
+            # Move to home position
+            self.move_to_home()
+        rospy.sleep(3.0)
         
     def move_to_home(self):
         goal = FollowJointTrajectoryGoal()
@@ -56,13 +58,17 @@ class TestJogFrameNode(unittest.TestCase):
         point.positions = self.home_positions
         point.time_from_start = rospy.Duration(1.0)
         goal.trajectory.points.append(point)
-        self.client.send_goal(goal)
-        self.assertTrue(self.client.wait_for_result(timeout=rospy.Duration(5.0)))
-        rospy.sleep(1.0)
+
+        if self.client:
+            self.client.send_goal(goal)
+            self.assertTrue(self.client.wait_for_result(timeout=rospy.Duration(5.0)))
+            rospy.sleep(1.0)
         
     def test_a_jog_with_linear_delta(self):
         '''Test to jog a command with linear delta'''
         # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (start_pos, start_rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
             
@@ -77,6 +83,10 @@ class TestJogFrameNode(unittest.TestCase):
         jog.linear_delta.z = self.linear_delta
         self.pub.publish(jog)
         rospy.sleep(3.0)
+
+        # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (pos, rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
         # Check if the position is jogged by delta
@@ -91,6 +101,8 @@ class TestJogFrameNode(unittest.TestCase):
     def test_a_jog_with_angular_delta(self):
         '''Test to jog a command with angular delta'''
         # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (start_pos, start_rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
             
@@ -105,6 +117,10 @@ class TestJogFrameNode(unittest.TestCase):
         jog.angular_delta.z = self.angular_delta / math.sqrt(3.0)
         self.pub.publish(jog)
         rospy.sleep(3.0)
+        
+        # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time.now(), rospy.Duration(10))
         (pos, rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
         # Check if the position is not changed
@@ -119,6 +135,8 @@ class TestJogFrameNode(unittest.TestCase):
     def test_ten_jogs_with_linear_delta(self):
         '''Test to jog ten commands with linear delta'''
         # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (start_pos, start_rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
 
@@ -134,8 +152,12 @@ class TestJogFrameNode(unittest.TestCase):
             jog.linear_delta.z = self.linear_delta
             self.pub.publish(jog)
         rospy.sleep(3.0)
+        
+        # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (pos, rot) = self.listener.lookupTransform(
-        self.frame_id, self.link_name, rospy.Time(0))
+            self.frame_id, self.link_name, rospy.Time(0))
         # Check if the position is jogged by delta
         for i in range(3):
             self.assertAlmostEqual(pos[i], start_pos[i] + self.linear_delta*10, delta=0.0001)
@@ -146,6 +168,8 @@ class TestJogFrameNode(unittest.TestCase):
     def test_ten_jogs_with_angular_delta(self):
         '''Test to jog ten commands with angular delta'''
         # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (start_pos, start_rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
 
@@ -161,6 +185,10 @@ class TestJogFrameNode(unittest.TestCase):
             jog.angular_delta.z = self.angular_delta / math.sqrt(3.0)
             self.pub.publish(jog)
         rospy.sleep(3.0)
+
+        # Get current posture of link_name
+        self.listener.waitForTransform(
+            self.frame_id, self.link_name, rospy.Time(), rospy.Duration(10))
         (pos, rot) = self.listener.lookupTransform(
             self.frame_id, self.link_name, rospy.Time(0))
         # Check if the position is not changed
@@ -173,4 +201,4 @@ class TestJogFrameNode(unittest.TestCase):
             self.assertAlmostEqual(rot[i], ans_rot[i], delta=0.0001)
             
 if __name__ == '__main__':
-    rostest.rosrun('jog_frame', 'test_jog_frame_node', TestJogFrameNode)
+    rostest.rosrun('jog_controller', 'test_jog_frame_node', TestJogFrameNode)

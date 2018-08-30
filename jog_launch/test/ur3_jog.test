@@ -1,0 +1,41 @@
+<!-- Launch file to test the jog_controller with UR3 with fake_joint -->
+<launch>
+  <!-- Launch UR3 with fake_joint -->
+  <include file="$(find jog_launch)/launch/ur3.launch">
+    <arg name="use_fake_joint" value="true"/>
+    <arg name="use_moveit" value="true"/>
+    <arg name="use_rviz" value="false"/>
+    <arg name="use_joy" value="false"/>
+  </include>
+
+  <!-- Run tests -->
+  <param name="ur3_hztest/topic" value="joint_states"/>
+  <param name="ur3_hztest/hz" value="50.0"/>
+  <param name="ur3_hztest/hzerror" value="0.5"/>
+  <param name="ur3_hztest/test_duration" value="5.0"/>  
+  <test test-name="ur3_hztest" pkg="rostest" type="hztest"/>
+
+  <test test-name="ur3_joint_jog" pkg="jog_controller" type="test_jog_joint.py">
+    <rosparam>
+      controller_name: arm_controller
+      action_name: follow_joint_trajectory
+      joint_names: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
+      home_positions: [0.0, -1.0, 1.2, 0.0, 0, 0]
+      delta: 0.01
+    </rosparam>
+  </test>
+  <test test-name="ur3_frame_jog" pkg="jog_controller" type="test_jog_frame.py">
+    <rosparam>
+      controller_name: arm_controller
+      action_name: follow_joint_trajectory
+      joint_names: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
+      home_positions: [0.0, -1.0, 1.2, 0.0, 0, 0]
+      frame_id: base_link
+      group_name: manipulator
+      link_name: ee_link
+      linear_delta: 0.005
+      angular_delta: 0.01
+    </rosparam>
+  </test>
+  
+</launch>

@@ -20,6 +20,8 @@
 
   <exec_depend>ur3_moveit_config</exec_depend>
   <exec_depend>ur5_moveit_config</exec_depend>
+  <exec_depend>tra1_moveit_config</exec_depend>
+  <exec_depend>nextage_moveit_config</exec_depend>
 
   <export></export>
   

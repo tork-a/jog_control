@@ -17,7 +17,7 @@
   <!-- Launch rviz -->
   <node if="$(arg use_rviz)"
 	name="rviz" pkg="rviz" type="rviz"
-	args="-d $(find fake_joint_launch)/launch/jog.rviz"/>
+	args="-d $(find jog_launch)/launch/jog.rviz"/>
 
   <rosparam command="load" file="$(find jog_launch)/config/ur_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>

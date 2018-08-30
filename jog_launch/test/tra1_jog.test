@@ -1,0 +1,42 @@
+<!-- Launch file to test the jog_controller with TRA1 and fake_joint -->
+<launch>
+  <!-- Launch TRA1 with fake_joint -->
+  <include file="$(find jog_launch)/launch/tra1.launch">
+    <arg name="use_fake_joint" value="true"/>
+    <arg name="use_moveit" value="true"/>
+    <arg name="use_rviz" value="false"/>
+    <arg name="use_joy" value="false"/>
+  </include>
+
+  <!-- Run tests -->
+  <param name="tra1_hztest/topic" value="joint_states"/>
+  <param name="tra1_hztest/hz" value="50.0"/>
+  <param name="tra1_hztest/hzerror" value="0.5"/>
+  <param name="tra1_hztest/test_duration" value="5.0"/>  
+  <test test-name="tra1_hztest" pkg="rostest" type="hztest" name="tra1_hztest"/>
+
+  <test test-name="tra1_joint_jog" pkg="jog_controller" type="test_jog_joint.py">
+    <rosparam>
+      controller_name: position_trajectory_controller
+      action_name: follow_joint_trajectory
+      joint_names: [joint1, joint2, joint3, joint4, joint5, joint6]
+      home_positions: [0.0, 1.0, 1.2, 0.0, 1.0, 0]
+      delta: 0.01
+    </rosparam>
+  </test>
+
+  <test test-name="tra1_frame_jog" pkg="jog_controller" type="test_jog_frame.py">
+    <rosparam>
+      controller_name: position_trajectory_controller
+      action_name: follow_joint_trajectory
+      joint_names: [joint1, joint2, joint3, joint4, joint5, joint6]
+      home_positions: [0.0, 1.0, 1.2, 0.0, 1.0, 0]
+      frame_id: base_link
+      group_name: manipulator
+      link_name: link_j6
+      linear_delta: 0.005
+      angular_delta: 0.01
+    </rosparam>
+  </test>
+
+</launch>

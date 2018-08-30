@@ -2,8 +2,8 @@
 Changelog for package jog_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2018-08-30)
+------------------
 * Prepare for releasing (#28)
 * Migrating rostests from jog_controller to jog_launch (#27)
   - Add missing dependency

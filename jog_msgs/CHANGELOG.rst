@@ -2,8 +2,8 @@
 Changelog for package jog_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2018-08-30)
+------------------
 * Prepare for releasing
 * Change the naming of JogJoint and JogFrame messages (#1)
   * Add documents, quickstart launch files

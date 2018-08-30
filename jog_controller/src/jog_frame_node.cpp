@@ -77,7 +77,6 @@ JogFrameNode::JogFrameNode()
 {
   ros::NodeHandle gnh, pnh("~");
 
-  std::string controller_name;
   pnh.param<std::string>("target_link", target_link_, "link_6");
   pnh.param<std::string>("group", group_name_);
   pnh.param<double>("time_from_start", time_from_start_, 0.5);

@@ -1,0 +1,14 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package jog_msgs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* Prepare for releasing
+* Change the naming of JogJoint and JogFrame messages (#1)
+  * Add documents, quickstart launch files
+  * Change joints to joint_names
+  * Change the naming of JogJoint and JogFrame messages
+  * Add avoid_collisions to JogFrame
+* Add jog_msgs package
+* Contributors: Ryosuke Tajima

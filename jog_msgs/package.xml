@@ -4,12 +4,12 @@
   <version>0.0.0</version>
   <description>The jog_msgs package</description>
 
+  <author email="ryosuke.tajima@opensource-robotics.tokyo.jp">Ryosuke Tajima</author>
   <maintainer email="dev@opensource-robotics.tokyo.jp">Tokyo Opensource Robotics Kyokai(TORK) Developer Team</maintainer>
 
   <license>Apache License 2.0</license>
 
-  <!-- <url type="website">http://wiki.ros.org/jog_msgs</url> -->
-  <author email="ryosuke.tajima@opensource-robotics.tokyo.jp">Ryosuke Tajima</author>
+  <url type="website">http://wiki.ros.org/jog_msgs</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>message_generation</build_depend>

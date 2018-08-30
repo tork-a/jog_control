@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>jog_control</name>
+  <version>0.0.0</version>
+  <description>
+    This metapackage depends on packages related to jog control.
+  </description>
+  <author email="ryosuke.tajima@opensource-robotics.tokyo.jp">Ryosuke Tajima</author>
+  <maintainer email="dev@opensource-robotics.tokyo.jp">Tokyo Opensource Robotics Kyokai (TORK) Developer Team</maintainer>
+  <license>Apache License 2.0</license>
+
+  <url type="website">http://wiki.ros.org/jog_control</url>
+  <url type="repository">https://github.com/tork-a/jog_control</url>
+  <url type="bugtracker">https://github.com/tork-a/jog_control/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>jog_controller</exec_depend>
+  <exec_depend>jog_launch</exec_depend>
+  <exec_depend>jog_msgs</exec_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

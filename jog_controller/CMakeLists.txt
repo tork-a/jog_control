@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_visual_tools
   moveit_msgs
   roscpp
+  roslaunch
   rviz
 )
 
@@ -88,6 +89,9 @@ install(TARGETS jog_frame_node jog_joint_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(PROGRAMS script/joy_to_jog_frame.py script/joy_to_jog_joint.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 install(FILES plugin_description.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
@@ -95,21 +99,22 @@ install(TARGETS jog_controller
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
+install(DIRECTORY launch config
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
 # Tests
 if(CATKIN_ENABLE_TESTING)
-  find_package(roslint REQUIRED)
-  set(ROSLINT_CPP_OPTS "--filter=-runtime/references,-runtime/int")
-  # roslint_cpp(src/melfa_hardware_interface.cpp src/melfa_driver_node.cpp src/melfa_loopback_node.cpp)
-  set(ROSLINT_PYTHON_OPTS "--max-line-length=180")
-  # roslint_python(test/test_joint_trajectory_controller.py)
+
+  #find_package(roslint REQUIRED)
+  #set(ROSLINT_CPP_OPTS "--filter=-runtime/references,-runtime/int")
+  #set(ROSLINT_PYTHON_OPTS "--max-line-length=180")
   # add_dependencies(tests roslint)
 
-  find_package(roslaunch REQUIRED)
-  find_package(rostest REQUIRED)
-  # Remove tempolary for travis
-  # file(GLOB LAUNCH_FILES launch/*.launch)
-  # foreach(LAUNCH_FILE ${LAUNCH_FILES})
-  #   message(STATUS "Testing ${LAUNCH_FILE}")
-  #   roslaunch_add_file_check(${LAUNCH_FILE})
-  # endforeach()
+  file(GLOB LAUNCH_FILES launch/*.launch)
+  foreach(LAUNCH_FILE ${LAUNCH_FILES})
+    message(STATUS "Testing ${LAUNCH_FILE}")
+    roslaunch_add_file_check(${LAUNCH_FILE})
+  endforeach()
+
 endif()

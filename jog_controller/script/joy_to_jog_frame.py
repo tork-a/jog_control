@@ -50,6 +50,16 @@ class joy_to_jog_frame:
             msg.linear_delta.z = self.scale_linear['z']*joy.axes[self.axis_linear['z']]
         
         msg.avoid_collisions = True
+
+        # Skip if the delta  0
+        if (msg.linear_delta.x == 0 and
+            msg.linear_delta.y == 0 and
+            msg.linear_delta.z == 0 and
+            msg.angular_delta.x == 0 and
+            msg.angular_delta.y == 0 and
+            msg.angular_delta.z == 0):
+            return
+
         self.pub.publish(msg)
         
     def republish(self):

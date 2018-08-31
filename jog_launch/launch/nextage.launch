@@ -11,20 +11,27 @@
   </include>
 
   <!-- Launch MoveIt! -->
-  <arg name="kinematics_conf"
-       default="$(find nextage_moveit_config)/config/kinematics_kdl.yaml" />
-  <include file="$(find nextage_moveit_config)/launch/planning_context.launch">
-    <arg name="load_robot_description" value="true"/>
-  </include>
-  <include file="$(find nextage_moveit_config)/launch/move_group.launch">
-    <arg name="publish_monitored_planning_scene" value="true" />
-    <arg name="kinematics_conf_file" value="$(arg kinematics_conf)"/>
-  </include>
-  
+  <group if="$(arg use_moveit)">
+    <arg name="kinematics_conf"
+         default="$(find nextage_moveit_config)/config/kinematics_kdl.yaml" />
+    <include file="$(find nextage_moveit_config)/launch/planning_context.launch">
+      <arg name="load_robot_description" value="true"/>
+    </include>
+    <include file="$(find nextage_moveit_config)/launch/move_group.launch">
+      <arg name="publish_monitored_planning_scene" value="true" />
+      <arg name="kinematics_conf_file" value="$(arg kinematics_conf)"/>
+    </include>
+  </group>
+
   <!-- Launch jog_controllers -->
   <rosparam command="load" file="$(find jog_launch)/config/nextage_jog.yaml"/>
-  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <param name="use_action" value="true"/>
+    <param name="time_from_start" value="0.5"/>
+  </node>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="use_action" value="true"/>
+    <param name="time_from_start" value="0.8"/>
   </node>
 
   <!-- Launch joypad -->

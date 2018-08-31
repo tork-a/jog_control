@@ -7,9 +7,9 @@ axis_linear:
   z: 4
 
 scale_linear:
-  x: -0.005
-  y: 0.005
-  z: 0.005
+  x: -0.001
+  y: 0.001
+  z: 0.001
   
 axis_angular:
   x: 0
@@ -17,6 +17,6 @@ axis_angular:
   z: 4
   
 scale_angular:
-  x: -0.05
-  y: 0.05
-  z: 0.05
+  x: -0.005
+  y: 0.005
+  z: 0.005

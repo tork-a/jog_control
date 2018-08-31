@@ -50,12 +50,15 @@ int JogFrameNode::get_controller_list()
       {
         ROS_WARN_STREAM("type is not specifed for controller " << name << ", using default FollowJointTrajectory");
       }
-      type = std::string(controller_list[i]["type"]);
-      if (type != "FollowJointTrajectory")
-      {
-        ROS_ERROR_STREAM("controller type " << type << " is not supported");
-        return -1;
-      }
+      else
+	{
+	  type = std::string(controller_list[i]["type"]);
+	  if (type != "FollowJointTrajectory")
+	    {
+	      ROS_ERROR_STREAM("controller type " << type << " is not supported");
+	      return -1;
+	    }
+	}
       // Create controller map
       cinfo_map_[name].action_ns = action_ns;
       cinfo_map_[name].joints.resize(joints.size());

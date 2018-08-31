@@ -22,7 +22,7 @@ class joy_to_jog_frame:
         self.axis_linear = rospy.get_param('~axis_linear', {'x': 0, 'y': 1, 'z': 4})
         self.axis_angular = rospy.get_param('~axis_angular', {'x': 0, 'y': 1, 'z': 4})
         self.scale_linear = rospy.get_param('~scale_linear', {'x': 0.05, 'y': 0.05, 'z': 0.05})
-        self.scale_angular = rospy.get_param('~scales_angular', {'x': 0.05, 'y': 0.05, 'z': 0.05})
+        self.scale_angular = rospy.get_param('~scale_angular', {'x': 0.05, 'y': 0.05, 'z': 0.05})
 
         self.pub = rospy.Publisher('jog_frame', JogFrame, queue_size=1)
 

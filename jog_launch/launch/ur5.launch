@@ -3,6 +3,8 @@
   <arg name="use_moveit" default="false"/>
   <arg name="use_rviz" default="false"/>
   <arg name="use_joy" default="false"/>
+  <arg name="use_action" default="false"/>
+  <arg name="intermittent" default="false"/>
 
   <!-- Launch fake_joint_launch -->
   <include if="$(arg use_fake_joint)"
@@ -20,9 +22,13 @@
 	args="-d $(find jog_launch)/launch/jog.rviz"/>
   
   <rosparam command="load" file="$(find jog_launch)/config/ur_jog.yaml"/>
-  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node"/>
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <param name="use_action" value="$(arg use_action)"/>
+    <param name="intermittent" value="$(arg intermittent)"/>
+  </node>
   <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
-    <param name="use_action" value="true"/>
+    <param name="use_action" value="$(arg use_action)"/>
+    <param name="intermittent" value="$(arg intermittent)"/>
   </node>
 
   <!-- Launch joypad -->

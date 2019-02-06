@@ -78,7 +78,13 @@ JogJointNode::JogJointNode()
 
   pnh.param<double>("time_from_start", time_from_start_, 0.2);
   pnh.param<bool>("use_action", use_action_, false);
+  pnh.param<bool>("intermittent", intermittent_, false);
 
+  if (not use_action_ && intermittent_)
+  {
+    ROS_WARN("'intermittent' param should be true with 'use_action'. Assuming to use action'");
+    use_action_ = true;
+  }
   if (get_controller_list() < 0)
   {
     ROS_ERROR("get_controller_list faild. Aborted.");
@@ -154,6 +160,20 @@ void JogJointNode::jog_joint_cb(jog_msgs::JogJointConstPtr msg)
     ROS_ERROR("Size mismatch of joint_names and deltas");
     return;
   }
+  // In intermittent mode, confirm to all of the action is completed
+  if (intermittent_)
+  {
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+    {
+      auto controller_name = it->first;
+      actionlib::SimpleClientGoalState state = traj_clients_[controller_name]->getState();
+      if (state == actionlib::SimpleClientGoalState::ACTIVE)
+      {
+        return;
+      }
+    }    
+  }
+  
   // Update only if the stamp is older than last_stamp_ + time_from_start
   if (msg->header.stamp > last_stamp_ + ros::Duration(time_from_start_))
   {

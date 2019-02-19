@@ -288,6 +288,8 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
     return;
   }
 
+  // ROS_INFO_STREAM("ik response:\n" << ik.response);
+  
   auto state = ik.response.solution.joint_state;
   geometry_msgs::PoseStamped pose_check;
   
@@ -310,10 +312,9 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   }
   if (error > M_PI / 2)
   {
-    ROS_WARN_STREAM("**** Validation check Failed: " << error);
+    ROS_ERROR_STREAM("**** Validation check Failed: " << error);
     return;
   }
-  
   // Publish trajectory message for each controller
   for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
   {

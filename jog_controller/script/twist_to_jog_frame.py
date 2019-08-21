@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 
-# Take joystick cmds. Republish them as JogFrame
-
-# RB: +x, LB: -x
-# L on L dpad: +x
-# Up on L dpad: +z
-
-# R on R stick: +Rx
-# Up on R stick: +Ry
-# B: +Rz, A: -Rz
+# Take spacemouse twist. Republish them as JogFrame
 
 import rospy
 from jog_msgs.msg import JogFrame
@@ -30,16 +22,8 @@ class twist_to_jog_frame:
             abs(axe)
         highest = axis.index(max(axis))
 
-        # Instanciate a new twist with values set to 0
         dominantTwist = Twist()
-        # dominantTwist.linear.x=0
-        # dominantTwist.linear.y=0
-        # dominantTwist.linear.z=0
-        # dominantTwist.angular.x=0
-        # dominantTwist.angular.y=0
-        # dominantTwist.angular.z=0
-
-        # Add the dominant value to the right axis
+        # Add the dominant value to the dominant axis
         if highest == 0:
             dominantTwist.linear.x = twist_msg.linear.x
         elif highest == 1:
@@ -55,7 +39,8 @@ class twist_to_jog_frame:
 
         return dominantTwist
 
-    # Python code to remove duplicate elements 
+    # Check if two axis are identical
+    # return a list with all members set to zero if true
     def hasDuplicate(self, duplicate): 
         final_list = [] 
         for num in duplicate: 

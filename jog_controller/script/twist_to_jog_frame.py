@@ -97,6 +97,6 @@ class twist_to_jog_frame:
         rospy.spin()
 
 if __name__ == '__main__':
-    rospy.init_node('twist_to_jog_frame', anonymous=True)
+    rospy.init_node('joy_to_jog_frame', anonymous=True)
     republisher = twist_to_jog_frame()
     republisher.republish()

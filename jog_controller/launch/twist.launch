@@ -1,6 +1,6 @@
 <launch>
   <arg name="joy_config" default="spacemouse_twist"/>
-  <arg name="dominant_mode" default="False"/>
+  <arg name="dominant_mode" default="True"/>
   <arg name="group_name" default="manipulator"/>
   <arg name="link_name" default="tool0"/>
   <arg name="frame_id" default="tool0"/>

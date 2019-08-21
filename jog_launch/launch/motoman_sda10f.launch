@@ -3,7 +3,7 @@
 
   <!-- Launch jog controllers -->
   <rosparam command="load"
-	    file="$(find jog_controller)/config/motoman_sda10f_jog.yaml"/>
+	    file="$(find jog_launch)/config/motoman_sda10f_jog.yaml"/>
   <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
     <remap from="command" to="joint_path_command"/>
   </node>

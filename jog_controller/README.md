@@ -316,3 +316,66 @@ avoid_collisions: True
 ```
 
 and check your sticks produce desired message.
+
+### SpaceMouse
+
+`twist.launch` is the launch file to bringup spacenav_node
+and the converter node (twist_to_jog_frame.py). This launch file have
+following arguments.
+
+- `joy_config` (default: spacemouse_twist)
+
+  Configure file to setup button asignments. You can find an example
+  in `config/spacemouse_twist.config.yaml`. Notice you need to modify the
+  config file to adjust speeds.
+
+- `group_name` (default: manipulator)
+
+  This is the MoveIt! group name to jog. It need to be identical to
+  the group name you want to use.
+
+- `link_name` (default: tool0)
+
+  This is the link_name to jog. You need to specify valid frame name
+  in the group.
+  
+- `frame_id`
+
+  Reference frame for frame jogging. You can specify valid frame name
+  such as `base_link`, `tool0` and so on.
+  
+Please check your spacemouse is available by launching twist.launch.
+
+```
+$ roslaunch jog_controller joypad.launch
+```
+
+If you have no error, please check if the jog_frame topic is
+published.
+
+```
+$ rostopic echo /jog_frame
+```
+
+You can see message like:
+
+```
+header: 
+  seq: 751
+  stamp: 
+    secs: 1531982605
+    nsecs: 330952195
+  frame_id: "base_link"
+group_name: "manipulator"
+link_name: "tool0"
+linear_delta: 
+  x: 0.0
+  y: -0.0
+  z: -0.0
+angular_delta: 
+  x: 0.0
+  y: 0.0
+  z: 0.0
+avoid_collisions: True
+```
+and check your /spacenav/twist produce desired message.

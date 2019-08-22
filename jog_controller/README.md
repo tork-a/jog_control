@@ -329,6 +329,10 @@ following arguments.
   in `config/spacemouse_twist.config.yaml`. Notice you need to modify the
   config file to adjust speeds.
 
+- `dominant_mode` (default: True)
+
+  When dominant mode is enabled, only the biggest absolute value is kept.
+
 - `group_name` (default: manipulator)
 
   This is the MoveIt! group name to jog. It need to be identical to

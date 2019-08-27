@@ -5,12 +5,14 @@
 import rospy
 from jog_msgs.msg import JogFrame
 from geometry_msgs.msg import Twist
+import numpy as np
 
 class twist_to_jog_frame:
 
     def __init__(self):
         self.scale_linear = rospy.get_param('~scale_linear', {'x': 0.05, 'y': 0.05, 'z': 0.05})
         self.scale_angular = rospy.get_param('~scales_angular', {'x': 0.05, 'y': 0.05, 'z': 0.05})
+        self.rotation_matrix = np.matrix(rospy.get_param('~rotation_matrix', [[0,0,0],[0,0,0],[0,0,0]]))
 
         self.pub = rospy.Publisher('jog_frame', JogFrame, queue_size=1)
 
@@ -39,6 +41,22 @@ class twist_to_jog_frame:
 
         return dominantTwist
 
+    def axisRemap(self, twist_msg):
+        # Computed axis remap
+        linear_mat = [twist_msg.linear.x, twist_msg.linear.y, twist_msg.linear.z] * self.rotation_matrix
+        angular_mat = [twist_msg.angular.x, twist_msg.angular.y, twist_msg.angular.z] * self.rotation_matrix
+
+        # Remapped values allocation
+        remappedTwist = Twist()
+        remappedTwist.linear.x = linear_mat[0,0]
+        remappedTwist.linear.y = linear_mat[0,1]
+        remappedTwist.linear.z = linear_mat[0,2]
+        remappedTwist.angular.x = angular_mat[0,0]
+        remappedTwist.angular.y = angular_mat[0,1]
+        remappedTwist.angular.z = angular_mat[0,2]
+
+        return remappedTwist
+
     # Check if two axis are identical
     # return a list with all members set to zero if true
     def hasDuplicate(self, duplicate): 
@@ -63,6 +81,9 @@ class twist_to_jog_frame:
 
         if rospy.get_param('~dominant_mode', True):
             twist = self.dominantAxisMode(twist)
+
+        if rospy.get_param('~axis_remap', True):
+            twist = self.axisRemap(twist)
 
         msg.angular_delta.x = self.scale_angular['x']*twist.angular.x
         msg.angular_delta.y = self.scale_angular['y']*twist.angular.y

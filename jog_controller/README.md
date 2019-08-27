@@ -249,13 +249,13 @@ following arguments.
 
 - `joy_config` (default: xbox_wireless)
 
-  Configure file to setup button asignments. You can find an example
+  Configure file to setup button assignments. You can find an example
   in `config/xbox_wireless.config.yaml`. Notice you need to modify the
   config file to fit your joypad device.
 
 - `group_name` (default: manipulator)
 
-  This is the MoveIt! group name to jog. It need to be identical to
+  This is the MoveIt! group name to jog. It needs to be identical to
   the group name you want to use.
 
 - `link_name` (default: tool0)
@@ -325,17 +325,17 @@ following arguments.
 
 - `joy_config` (default: spacemouse_twist)
 
-  Configure file to setup button asignments. You can find an example
+  Configure file to setup button assignments. You can find an example
   in `config/spacemouse_twist.config.yaml`. Notice you need to modify the
-  config file to adjust speeds.
+  config file to adjust speeds and set up the proper rotation matrix for your use case.
 
 - `dominant_mode` (default: True)
 
-  When dominant mode is enabled, only the biggest absolute value is kept.
+  When the dominant mode is enabled, only the biggest absolute value is kept.
 
 - `group_name` (default: manipulator)
 
-  This is the MoveIt! group name to jog. It need to be identical to
+  This is the MoveIt! group name to jog. It needs to be identical to
   the group name you want to use.
 
 - `link_name` (default: tool0)
@@ -351,7 +351,7 @@ following arguments.
 Please check your spacemouse is available by launching twist.launch.
 
 ```
-$ roslaunch jog_controller joypad.launch
+$ roslaunch jog_controller twist.launch
 ```
 
 If you have no error, please check if the jog_frame topic is

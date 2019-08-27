@@ -12,17 +12,17 @@ class twist_to_jog_frame:
     def __init__(self):
         self.scale_linear = rospy.get_param('~scale_linear', {'x': 0.05, 'y': 0.05, 'z': 0.05})
         self.scale_angular = rospy.get_param('~scales_angular', {'x': 0.05, 'y': 0.05, 'z': 0.05})
-        self.rotation_matrix = np.matrix(rospy.get_param('~rotation_matrix', [[0,0,0],[0,0,0],[0,0,0]]))
+        self.rotation_matrix = np.matrix(rospy.get_param('~rotation_matrix', [[1,0,0],[0,1,0],[0,0,1]]))
 
         self.pub = rospy.Publisher('jog_frame', JogFrame, queue_size=1)
 
     # Analyze a Twist_msg and return only the dominant axis
     def dominantAxisMode(self, twist_msg):
-        axis = {twist_msg.linear.x, twist_msg.linear.y, twist_msg.linear.z, twist_msg.angular.x, twist_msg.angular.y, twist_msg.angular.z}
-        axis = self.hasDuplicate(axis)
-        for axe in axis:
-            abs(axe)
-        highest = axis.index(max(axis))
+        axes = {twist_msg.linear.x, twist_msg.linear.y, twist_msg.linear.z, twist_msg.angular.x, twist_msg.angular.y, twist_msg.angular.z}
+        axes = self.hasDuplicate(axis)
+        for axis in axes:
+            abs(axis)
+        highest = axes.index(max(axes))
 
         dominantTwist = Twist()
         # Add the dominant value to the dominant axis
@@ -41,7 +41,7 @@ class twist_to_jog_frame:
 
         return dominantTwist
 
-    def axisRemap(self, twist_msg):
+    def axesRemap(self, twist_msg):
         # Computed axis remap
         linear_mat = [twist_msg.linear.x, twist_msg.linear.y, twist_msg.linear.z] * self.rotation_matrix
         angular_mat = [twist_msg.angular.x, twist_msg.angular.y, twist_msg.angular.z] * self.rotation_matrix
@@ -83,7 +83,7 @@ class twist_to_jog_frame:
             twist = self.dominantAxisMode(twist)
 
         if rospy.get_param('~axis_remap', True):
-            twist = self.axisRemap(twist)
+            twist = self.axesRemap(twist)
 
         msg.angular_delta.x = self.scale_angular['x']*twist.angular.x
         msg.angular_delta.y = self.scale_angular['y']*twist.angular.y

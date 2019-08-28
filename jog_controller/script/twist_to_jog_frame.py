@@ -82,7 +82,7 @@ class twist_to_jog_frame:
         if rospy.get_param('~dominant_mode', True):
             twist = self.dominantAxisMode(twist)
 
-        if rospy.get_param('~axis_remap', True):
+        if rospy.get_param('~axes_remap', True):
             twist = self.axesRemap(twist)
 
         msg.angular_delta.x = self.scale_angular['x']*twist.angular.x

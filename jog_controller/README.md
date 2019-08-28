@@ -325,9 +325,9 @@ following arguments.
 
 - `joy_config` (default: spacemouse_twist)
 
-  Configure file to setup the following agruments. You can find an example in `config/spacemouse_twist.config.yaml`
-  
+  Use the configuration file to setup the agruments. You can find an example in `config/spacemouse_twist.config.yaml`
   The config file has the following arguments:
+  
   | Argument | Default | Details|
   |----------|---------|--------|
   | `scale_linear` | 0.005 | This is the linear speed multiplier |

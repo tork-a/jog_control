@@ -53,7 +53,7 @@ class joy_to_jog_frame:
         self.pub.publish(msg)
         
     def republish(self):
-        rospy.Subscriber("joy", Joy, self.callback)
+        rospy.Subscriber(rospy.get_param('~sub_topic', 'joy'), Joy, self.callback)
 
         rospy.spin()
 

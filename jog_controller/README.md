@@ -238,7 +238,7 @@ in the rviz pane.
 ### joypad
 
 `joypad.launch` is the launch file to bringup joypad driver (joy node)
-and the converter node (joy_to_jog_frame.py). This launch file have
+and the converter node (joy_to_jog_frame.py). This launch file has the
 following arguments.
 
 - `joy_dev` (default: /dev/input/js0)
@@ -249,18 +249,18 @@ following arguments.
 
 - `joy_config` (default: xbox_wireless)
 
-  Configure file to setup button asignments. You can find an example
+  Configure file to setup button assignments. You can find an example
   in `config/xbox_wireless.config.yaml`. Notice you need to modify the
   config file to fit your joypad device.
 
 - `group_name` (default: manipulator)
 
-  This is the MoveIt! group name to jog. It need to be identical to
+  This is the MoveIt! group name to jog. It needs to be identical to
   the group name you want to use.
 
 - `link_name` (default: tool0)
 
-  This is the link_name to jog. You need to specify valid frame name
+  This is the link_name to jog. You need to specify a valid frame name
   in the group.
   
 - `frame_id`
@@ -316,3 +316,73 @@ avoid_collisions: True
 ```
 
 and check your sticks produce desired message.
+
+### SpaceMouse
+
+`twist.launch` is the launch file to bringup spacenav_node
+and the converter node (twist_to_jog_frame.py). This launch file has the
+following arguments.
+
+- `joy_config` (default: spacemouse_twist)
+
+  Use the configuration file to setup the agruments. You can find an example in `config/spacemouse_twist.config.yaml`
+  The config file has the following arguments:
+  
+  | Argument | Default | Details|
+  |----------|---------|--------|
+  | `scale_linear` | 0.005 | This is the linear speed multiplier |
+  | `scale_angular` | 0.05| This is the angular speed multiplier |
+  | `dominant_mode` | True | When the dominant mode is enabled, only the biggest absolute value is kept. |
+  | `axes_remap` | True | Enable if a rotation matrix is required. |
+  | `rotation_matrix` | | The rotation matrix required to transform the space mouse input from it's coordinate system to the target coordinate system. |
+
+- `group_name` (default: manipulator)
+
+  This is the MoveIt! group name to jog. It needs to be identical to
+  the group name you want to use.
+
+- `link_name` (default: tool0)
+
+  This is the link_name to jog. You need to specify a valid frame name
+  in the group.
+  
+- `frame_id`
+
+  Reference frame for frame jogging. You can specify valid frame name
+  such as `base_link`, `tool0` and so on.
+  
+Please check your spacemouse is available by launching twist.launch.
+
+```
+$ roslaunch jog_controller twist.launch
+```
+
+If you have no error, please check if the jog_frame topic is
+published.
+
+```
+$ rostopic echo /jog_frame
+```
+
+You can see message like:
+
+```
+header: 
+  seq: 751
+  stamp: 
+    secs: 1531982605
+    nsecs: 330952195
+  frame_id: "base_link"
+group_name: "manipulator"
+link_name: "tool0"
+linear_delta: 
+  x: 0.0
+  y: -0.0
+  z: -0.0
+angular_delta: 
+  x: 0.0
+  y: 0.0
+  z: 0.0
+avoid_collisions: True
+```
+and check your /spacenav/twist produce desired message.

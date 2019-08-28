@@ -4,6 +4,7 @@
   <arg name="group_name" default="manipulator"/>
   <arg name="link_name" default="tool0"/>
   <arg name="frame_id" default="base_link"/>
+  <arg name="sub_topic" default="joy"/>
   
   <node name="joy" pkg="joy" type="joy_node">
     <param name="dev" value="$(arg joy_dev)"/>
@@ -17,6 +18,7 @@
     <param name="group_name" value="$(arg group_name)"/>
     <param name="link_name" value="$(arg link_name)"/>
     <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="sub_topic" value="$(arg sub_topic)"/>
   </node>
 
 </launch>

@@ -19,7 +19,7 @@ class twist_to_jog_frame:
     # Analyze a Twist_msg and return only the dominant axis
     def dominantAxisMode(self, twist_msg):
         axes = {twist_msg.linear.x, twist_msg.linear.y, twist_msg.linear.z, twist_msg.angular.x, twist_msg.angular.y, twist_msg.angular.z}
-        axes = self.hasDuplicate(axis)
+        axes = self.hasDuplicate(axes)
         for axis in axes:
             abs(axis)
         highest = axes.index(max(axes))

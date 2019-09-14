@@ -13,7 +13,6 @@ class twist_to_jog_frame:
         self.scale_linear = rospy.get_param('~scale_linear', {'x': 0.05, 'y': 0.05, 'z': 0.05})
         self.scale_angular = rospy.get_param('~scales_angular', {'x': 0.05, 'y': 0.05, 'z': 0.05})
         self.rotation_matrix = np.matrix(rospy.get_param('~rotation_matrix', [[1,0,0],[0,1,0],[0,0,1]]))
-
         self.pub = rospy.Publisher('jog_frame', JogFrame, queue_size=1)
 
     # Analyze a Twist_msg and return only the dominant axis
@@ -98,11 +97,11 @@ class twist_to_jog_frame:
         self.pub.publish(msg)
         
     def republish(self):
-        rospy.Subscriber("/spacenav/twist", Twist, self.callback)
+        rospy.Subscriber(rospy.get_param('~sub_topic', 'spacenav/twist'), Twist, self.callback)
 
         rospy.spin()
 
 if __name__ == '__main__':
-    rospy.init_node('joy_to_jog_frame', anonymous=True)
+    rospy.init_node('twist_to_jog_frame', anonymous=True)
     republisher = twist_to_jog_frame()
     republisher.republish()

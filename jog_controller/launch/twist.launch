@@ -3,6 +3,7 @@
   <arg name="group_name" default="manipulator"/>
   <arg name="link_name" default="tool0"/>
   <arg name="frame_id" default="tool0"/>
+  <arg name="sub_topic" default="spacenav/twist"/>
 
   <include file="$(find spacenav_node)/launch/classic.launch"/>
   
@@ -12,6 +13,7 @@
     <param name="group_name" value="$(arg group_name)"/>
     <param name="link_name" value="$(arg link_name)"/>
     <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="sub_topic" value="$(arg sub_topic)"/>
   </node>
 
 </launch>

@@ -81,6 +81,13 @@ JogFrameNode::JogFrameNode()
   pnh.param<std::string>("group", group_name_);
   pnh.param<double>("time_from_start", time_from_start_, 0.5);
   pnh.param<bool>("use_action", use_action_, false);
+  pnh.param<bool>("intermittent", intermittent_, false);
+
+  if (not use_action_ && intermittent_)
+  {
+    ROS_WARN("'intermittent' param should be true with 'use_action'. Assuming to use action'");
+    use_action_ = true;
+  }
   // Exclude joint list
   gnh.getParam("exclude_joint_names", exclude_joints_);
 
@@ -154,6 +161,20 @@ JogFrameNode::JogFrameNode()
 void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
 {
   joint_state_.header.stamp = ros::Time::now();
+
+  // In intermittent mode, confirm to all of the action is completed
+  if (intermittent_)
+  {
+    for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
+    {
+      auto controller_name = it->first;
+      actionlib::SimpleClientGoalState state = traj_clients_[controller_name]->getState();
+      if (state == actionlib::SimpleClientGoalState::ACTIVE)
+      {
+        return;
+      }
+    }    
+  }
   // Update reference frame only if the stamp is older than last_stamp_ + time_from_start_
   if (msg->header.stamp > last_stamp_ + ros::Duration(time_from_start_))
   {
@@ -267,6 +288,8 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
     return;
   }
 
+  // ROS_INFO_STREAM("ik response:\n" << ik.response);
+  
   auto state = ik.response.solution.joint_state;
   geometry_msgs::PoseStamped pose_check;
   
@@ -289,10 +312,9 @@ void JogFrameNode::jog_frame_cb(jog_msgs::JogFrameConstPtr msg)
   }
   if (error > M_PI / 2)
   {
-    ROS_WARN_STREAM("**** Validation check Failed: " << error);
+    ROS_ERROR_STREAM("**** Validation check Failed: " << error);
     return;
   }
-  
   // Publish trajectory message for each controller
   for (auto it=cinfo_map_.begin(); it!=cinfo_map_.end(); it++)
   {

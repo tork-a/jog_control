@@ -56,6 +56,7 @@ protected:
 
   double time_from_start_;
   bool use_action_;
+  bool intermittent_;
 
   std::string target_link_;
   std::string group_name_;

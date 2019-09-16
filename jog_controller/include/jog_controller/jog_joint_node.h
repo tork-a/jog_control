@@ -54,6 +54,7 @@ protected:
   ros::Time last_stamp_;
   double time_from_start_;
   bool use_action_;
+  bool intermittent_;
 };
 
 } // namespace jog_joint

@@ -1,0 +1,22 @@
+<launch>
+  <arg name="joy_config" default="spacemouse_twist"/>
+  <arg name="group_name" default="manipulator"/>
+  <arg name="link_name" default="tool0"/>
+  <arg name="frame_id" default="tool0"/>
+  <arg name="sub_topic" default="spacenav/twist"/>
+  <arg name="launch_spacenav" default="true"/>
+
+  <group if="$(arg launch_spacenav)">
+    <include file="$(find spacenav_node)/launch/classic.launch"/>
+  </group>
+  
+  <node name="twist_to_jog_frame" pkg="jog_controller" type="twist_to_jog_frame.py">
+    <rosparam command="load"
+	      file="$(find jog_controller)/config/$(arg joy_config).config.yaml"/>
+    <param name="group_name" value="$(arg group_name)"/>
+    <param name="link_name" value="$(arg link_name)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="sub_topic" value="$(arg sub_topic)"/>
+  </node>
+
+</launch>

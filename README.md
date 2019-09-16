@@ -210,6 +210,11 @@ You ca add new panel JogFramePanel in rviz.
 You can also use a joypad. Please consult
 [jog_controller/README.md](jog_controller/README.md)
 
+## SpaceMouse control
+
+You can also use a SpaceMouse. Please consult
+[jog_controller/README.md](jog_controller/README.md)
+
 ## Teaching pendant
 
 You can also use a teaching pendant.

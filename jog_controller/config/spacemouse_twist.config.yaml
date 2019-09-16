@@ -1,0 +1,16 @@
+scale_linear:
+  x: 0.05
+  y: 0.05
+  z: 0.05
+  
+scale_angular:
+  x: 0.005
+  y: 0.005
+  z: 0.005
+
+dominant_mode: True
+
+axes_remap: True
+
+rotation_matrix:
+  [[0,-1,0],[0,0,-1],[1,0,0]]

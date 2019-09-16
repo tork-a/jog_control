@@ -2,8 +2,8 @@
 Changelog for package jog_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2019-09-16)
+------------------
 * Add `intermittent` parameter (`#31 <https://github.com/tork-a/jog_control/issues/31>`_ )
   - When this parameter true, jog motions wait for the end of previous action
   - Add i611 files

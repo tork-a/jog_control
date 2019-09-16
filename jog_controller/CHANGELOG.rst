@@ -2,6 +2,25 @@
 Changelog for package jog_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add `intermittent` parameter (`#31 <https://github.com/tork-a/jog_control/issues/31>`_ )
+  - When this parameter is true, jog motions wait for the end of previous action
+* Implemented a twist_to_jogframe controller (`#39 <https://github.com/tork-a/jog_control/issues/39>`_ )
+  - added optional arg to lauch the spacenav
+  - added missing dependency in package.
+  - Added Twist to jog frame missing launch file arg
+  - Update README.md
+  - Fix typos, renamed argument. Mod def scale values
+  - Asked modifications for pr.
+  - New method to tf from spacenav axis to EEF.
+  - Added missing launch file arg to ReadMe
+  - clean up of twist script
+  - fix to make it work
+  - tested joy control using space mouse
+  - Change validation message as ROS_ERROR
+* Contributors: Alexandre Francoeur, LazyEngineerToBe, Ryosuke Tajima
+
 0.0.1 (2018-08-30)
 ------------------
 * Prepare for releasing (#28)

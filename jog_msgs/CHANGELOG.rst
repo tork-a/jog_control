@@ -2,6 +2,9 @@
 Changelog for package jog_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.1 (2018-08-30)
 ------------------
 * Prepare for releasing

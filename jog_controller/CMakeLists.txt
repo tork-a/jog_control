@@ -89,7 +89,7 @@ install(TARGETS jog_frame_node jog_joint_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(PROGRAMS script/joy_to_jog_frame.py script/joy_to_jog_joint.py
+install(PROGRAMS script/joy_to_jog_frame.py script/joy_to_jog_joint.py script/twist_to_jog_frame.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES plugin_description.xml

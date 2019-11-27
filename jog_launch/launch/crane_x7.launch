@@ -1,0 +1,24 @@
+<launch>
+  <arg name="use_joy" default="false"/>
+  <arg name="use_action" default="false"/>
+  <arg name="intermittent" default="false"/>
+
+  <rosparam command="load"
+	    file="$(find jog_launch)/config/crane_x7.yaml"/>
+
+  <node name="jog_joint_node" pkg="jog_controller" type="jog_joint_node">
+    <param name="use_action" value="$(arg use_action)"/>
+    <param name="intermittent" value="$(arg intermittent)"/>
+  </node>
+  <node name="jog_frame_node" pkg="jog_controller" type="jog_frame_node">
+    <param name="use_action" value="$(arg use_action)"/>
+    <param name="intermittent" value="$(arg intermittent)"/>
+  </node>
+
+  <!-- Launch joypad -->
+  <include if="$(arg use_joy)" file="$(find jog_controller)/launch/joypad.launch">
+    <arg name="group_name" value="arm"/>
+    <arg name="frame_id" value="base_link"/>
+    <arg name="link_name" value="crane_x7_gripper_base_link"/>
+  </include>
+</launch>

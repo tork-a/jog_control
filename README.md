@@ -201,6 +201,25 @@ And launch jog nodes.
 $ roslaunch jog_launch motoman_sda10f.launch 
 ```
 
+## CRANE-X7
+
+![CRANE-X7_jog_control](image/crane_x7_jog.png)
+
+The CRANE-X7 package is [here](https://github.com/rt-net/crane_x7_ros).
+
+Launch simulation and MoveIt!
+
+```
+$ roslaunch crane_x7_gazebo crane_x7_with_table.launch
+```
+
+And launch jog nodes.
+
+```
+$ roslaunch jog_launch crane_x7.launch
+```
+
+
 ## rviz JogFramePanel Pugin
 
 You ca add new panel JogFramePanel in rviz. 

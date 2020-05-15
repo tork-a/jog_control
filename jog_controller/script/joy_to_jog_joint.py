@@ -26,15 +26,16 @@ class joy_to_jog_joint:
 
         msg.header.stamp = rospy.Time.now()
         msg.header.frame_id = 'base_link'
-        msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']
+        # msg.joint_names = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']
+	msg.joint_names = rospy.get_param("controller_joint_names","['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']")
         # These buttons are binary
-        msg.displacement = [0]*6
-        msg.displacement[0] = 0.05*(-joy.buttons[4] + joy.buttons[5])
-        msg.displacement[1] = 0.05*(joy.axes[0])
-        msg.displacement[2] = 0.05*(joy.axes[1])
-        msg.displacement[3] = 0.05*(joy.buttons[0] - joy.buttons[1])
-        msg.displacement[4] = 0.05*(joy.buttons[2] - joy.buttons[3])
-        msg.displacement[5] = 0.05*(joy.buttons[7] - joy.buttons[6])
+        msg.deltas = [0]*6
+        msg.deltas[0] = 0.05*(-joy.buttons[4] + joy.buttons[5])
+        msg.deltas[1] = 0.05*(joy.axes[0])
+        msg.deltas[2] = 0.05*(joy.axes[1])
+        msg.deltas[3] = 0.05*(joy.buttons[0] - joy.buttons[1])
+        msg.deltas[4] = 0.05*(joy.buttons[2] - joy.buttons[3])
+        msg.deltas[5] = 0.05*(joy.buttons[7] - joy.buttons[6])
 
         self.pub.publish(msg)
         

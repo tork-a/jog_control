@@ -73,7 +73,7 @@ class joy_to_jog_frame:
 
             msg_jnt.header.stamp = rospy.Time.now()
             msg_jnt.header.frame_id = rospy.get_param('~frame_id', 'base_link')
-            msg_jnt.joint_names = rospy.get_param("controller_joint_names","['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']")
+            msg_jnt.joint_names = rospy.get_param("/jog_joint_node/joint_names","['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']")
             # These buttons are binary
             msg_jnt.deltas = [0]*6
             msg_jnt.deltas[0] = self.scale_joints['J1']*(joy.axes[self.axis_joints['J1']])

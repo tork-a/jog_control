@@ -12,7 +12,7 @@
     <param name="deadzone" value="0.2"/>
   </node>
   
-  <node name="joy_to_jog_frame" pkg="jog_controller" type="joy_to_jog_frame.py">
+  <node name="joy_to_jog" pkg="jog_controller" type="joy_to_jog.py">
     <rosparam command="load"
 	      file="$(find jog_controller)/config/$(arg joy_config).config.yaml"/>
     <param name="group_name" value="$(arg group_name)"/>
